@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Fragment.StaffFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="8dp">
+        <EditText
+            android:id="@+id/ed_Staff_Search"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:background="@null"
+            android:hint="nhập tên nhân viên"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/ic_baseline_search_24"
+            android:paddingLeft="10dp"/>
+        <Button
+            android:id="@+id/btn_Staff_Search"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="0.4"
+            android:backgroundTint="#b2ffba"
+            android:text="Tìm"/>
+    </LinearLayout>
+    <ListView
+        android:id="@+id/lv_Staff"
+        android:layout_marginTop="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fl_Add_Staff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:src="@android:drawable/ic_input_add" />
+</FrameLayout>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragment.ThongKeFragment"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="8dp">
+        <EditText
+            android:id="@+id/ed_Year_Search"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:background="@null"
+            android:hint="nhập năm"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/ic_baseline_search_24"
+            android:paddingLeft="10dp"/>
+        <Button
+            android:id="@+id/btnYearSearch"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="0.4"
+            android:backgroundTint="#b2ffba"
+            android:text="Tìm"/>
+    </LinearLayout>
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/barChart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>

@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Duan_N1_17303</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login.string.0">Hello</string>
+    <string name="login.string.1">Enter your userName</string>
+    <string name="login.string.2">Enter Password</string>
+    <string name="login.string.3">Forget Your Password?</string>
+    <string name="login.string.4">Login</string>
+    <string-array name="room_type">
+        <item>Phòng đơn</item>
+        <item>Phòng đôi</item>
+        <item>Phòng cỡ lớn</item>
+    </string-array>
+
+    <string-array name="room_view">
+        <item>View đẹp</item>
+        <item>View thường</item>
+    </string-array>
+</resources>

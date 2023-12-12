@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+   >
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:backgroundTint="#b2ffba"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="10dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="15dp">
+
+            <TextView
+                android:id="@+id/tv_Customer_Id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="Mã khách hàng: "
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_Customer_Name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tên khách hàng: "
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tv_Customer_Date_Of_Birth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ngày sinh: "
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/tv_Customer_Number_Phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Số điện thoại: "
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/tv_Customer_Sex"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Giới tính: "
+                android:textSize="16dp" />
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/img_Delete_Customer"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_delete_24"
+            android:layout_gravity="center_vertical|right"
+            android:layout_marginRight="20dp"/>
+
+
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

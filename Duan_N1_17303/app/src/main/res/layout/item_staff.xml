@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:backgroundTint="#b2ffba"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="10dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/tv_Display_Name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="Tên hiển thị: "
+                android:textColor="#000000"
+                android:textSize="25dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_User_Name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tài khoản: "
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/tv_Password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="Mật khẩu: "
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/tv_Staff_Date_Of_Birth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ngày sinh: "
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/tv_Staff_Sex"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Giới tính: "
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/tv_Staff_Number_Phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Số điện thoại: "
+                android:textSize="16dp" />
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/img_Delete_Staff"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical|right"
+            android:layout_marginRight="30dp"
+            android:src="@drawable/ic_delete_24" />
+
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

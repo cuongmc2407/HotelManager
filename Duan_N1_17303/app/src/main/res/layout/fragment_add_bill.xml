@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Tools.AddBillFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/fragmentAddBill_Toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#b2ffba "
+        android:fitsSystemWindows="true"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <ImageView
+            android:id="@+id/img_Back_Bill"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="left"
+            android:src="@drawable/ic_back" />
+
+        <TextView
+            android:id="@+id/tv_Title_Bill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Hóa đơn"
+            android:textColor="#000000"
+            android:textSize="25dp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/img_Save_Bill"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="right"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/ic_save" />
+    </androidx.appcompat.widget.Toolbar>
+
+
+        <Spinner
+            android:layout_margin="10dp"
+            android:id="@+id/spinner_Bill_Customer"
+            android:layout_width="match_parent"
+            android:layout_height="35dp" />
+    <Spinner
+        android:layout_margin="10dp"
+        android:id="@+id/spinner_Bill_Room"
+        android:layout_width="match_parent"
+        android:layout_height="35dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/fragmentAddBill_EditText_DateCheckIn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:hint="Ngày vào"
+            android:inputType="none" />
+
+        <ImageView
+            android:id="@+id/fragmentAddBill_ImageView_DateCheckIn_Picker"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_calendar" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/fragmentAddBill_EditText_HourCheckIn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:hint="Giờ vào"
+            android:inputType="none" />
+
+        <ImageView
+            android:id="@+id/fragmentAddBill_ImageView_HourCheckIn_Picker"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_clock" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/fragmentAddBill_EditText_DateCheckOut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:hint="Ngày ra"
+            android:inputType="none" />
+
+        <ImageView
+            android:id="@+id/fragmentAddBill_ImageView_DateCheckOut_Picker"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_calendar" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/fragmentAddBill_EditText_HourCheckOut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:hint="Giờ ra"
+            android:inputType="none" />
+
+        <ImageView
+            android:id="@+id/fragmentAddBill_ImageView_HourCheckOut_Picker"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_clock" />
+    </LinearLayout>
+
+</LinearLayout>

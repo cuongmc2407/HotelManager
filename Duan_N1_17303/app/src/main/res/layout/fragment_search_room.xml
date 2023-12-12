@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    android:orientation="vertical"
+    tools:context=".Fragment.SearchRoomFragment">
+
+    <LinearLayout
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/ed_Date_In"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:hint="Ngày đến"
+            android:lines="2" />
+    <ImageView
+        android:id="@+id/iv_findRoom_Date_In"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_calendar"
+        />
+        <EditText
+            android:id="@+id/ed_Hour_In"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:hint="Giờ vào"
+            android:inputType="none" />
+
+        <ImageView
+            android:id="@+id/iv_findRoom_Hour_in"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_clock" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/ed_Date_Out"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:hint="Ngày đi"
+            android:lines="2" />
+
+        <ImageView
+            android:id="@+id/iv_findRoom_Date_Out"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_calendar"
+            />
+        <EditText
+            android:id="@+id/ed_Hour_Our"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:hint="Giờ ra"
+            android:inputType="none" />
+
+        <ImageView
+            android:id="@+id/iv_findRoom_Hour_Our"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_clock" />
+    </LinearLayout>
+    <Button
+        android:id="@+id/btn_findRoom_find"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:backgroundTint="#80cb8a"
+        android:text="Tìm kiếm" />
+
+    <ListView
+        android:id="@+id/lv_Search_Room"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

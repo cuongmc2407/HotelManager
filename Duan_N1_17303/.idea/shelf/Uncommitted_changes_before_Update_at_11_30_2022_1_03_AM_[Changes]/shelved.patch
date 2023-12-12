@@ -1,0 +1,353 @@
+Index: app/src/main/java/team1/fpoly/duan_n1_17303/Dao/RoomDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package team1.fpoly.duan_n1_17303.Dao;\r\n\r\nimport android.content.ContentValues;\r\nimport android.database.Cursor;\r\nimport android.database.sqlite.SQLiteDatabase;\r\n\r\nimport java.util.ArrayList;\r\n\r\nimport team1.fpoly.duan_n1_17303.Database.MyDatabase;\r\nimport team1.fpoly.duan_n1_17303.Object.Room;\r\n\r\npublic class RoomDao {\r\n    MyDatabase myDatabase;\r\n\r\n    public RoomDao(MyDatabase myDatabase) {\r\n        this.myDatabase = myDatabase;\r\n    }\r\n\r\n    //hiển thị dl\r\n    public ArrayList<Room> getListRoom(){\r\n        ArrayList<Room> listRoom = new ArrayList<>();\r\n        SQLiteDatabase sqLiteDatabase = myDatabase.getReadableDatabase();\r\n        String sql = \"SELECT * FROM ROOM\";\r\n        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);\r\n        if(cursor.getCount() !=0){\r\n            cursor.moveToFirst();\r\n            do{\r\n                listRoom.add(new Room(cursor.getInt(0),cursor.getString(1),cursor.getInt(2),cursor.getString(3), cursor.getString(4), cursor.getInt(5),cursor.getInt(6),cursor.getString(7)));\r\n            }while (cursor.moveToFirst());\r\n        }\r\n        return listRoom;\r\n    }\r\n\r\n    //thêm dl\r\n    public boolean insertRoom(Room room){\r\n        SQLiteDatabase sqLiteDatabase = myDatabase.getWritableDatabase();\r\n        ContentValues values = new ContentValues();\r\n        values.put(\"ROOM_NAME\", room.getRoomName());\r\n        values.put(\"ROOM_LOCATION\", room.getRoomLocation());\r\n        values.put(\"ROOM_TYPE\", room.getRoomType());\r\n        values.put(\"ROOM_VIEW\", room.getRoomView());\r\n        values.put(\"DAY_PRICE\", room.getDayPrice());\r\n        values.put(\"HOUR_PRICE\", room.getHourPrice());\r\n        values.put(\"NOTE\", room.getNote());\r\n        long check = sqLiteDatabase.insert(\"ROOM\", null, values);\r\n        if(check == -1)\r\n            return false;\r\n        return true;\r\n    }\r\n\r\n    //sửa dl\r\n    public boolean updateRoom(Room room){\r\n        SQLiteDatabase sqLiteDatabase = myDatabase.getWritableDatabase();\r\n        ContentValues values = new ContentValues();\r\n        values.put(\"ROOM_NAME\", room.getRoomName());\r\n        values.put(\"ROOM_LOCATION\", room.getRoomLocation());\r\n        values.put(\"ROOM_TYPE\", room.getRoomType());\r\n        values.put(\"ROOM_VIEW\", room.getRoomView());\r\n        values.put(\"DAY_PRICE\", room.getDayPrice());\r\n        values.put(\"HOUR_PRICE\", room.getHourPrice());\r\n        values.put(\"NOTE\", room.getNote());\r\n        long check = sqLiteDatabase.update(\"ROOM\",values,\"ROOM_ID = ?\", new String[]{String.valueOf(room.getRoomId())});\r\n        if(check==-1)\r\n            return false;\r\n        return true;\r\n    }\r\n\r\n    //1: xóa thành công- 0: thất bại - -1: đang có trong bill hoặc room_product\r\n    public int deleteProduct(int id){\r\n        SQLiteDatabase sqLiteDatabase = myDatabase.getWritableDatabase();\r\n        Cursor cursor = sqLiteDatabase.rawQuery(\"SELECT * FROM ROOM_PRODUCT WHERE ROOM_ID = ?\", new String[]{String.valueOf(id)});\r\n        if(cursor.getCount()!=0){\r\n            return -1;\r\n        }\r\n        Cursor cursor1 = sqLiteDatabase.rawQuery(\"SELECT * FROM BILL WHERE ROOM_ID = ?\", new String[]{String.valueOf(id)});\r\n        if(cursor1.getCount()!=0){\r\n            return -1;\r\n        }\r\n\r\n        long check = sqLiteDatabase.delete(\"ROOM\", \"ROOM_ID = ?\", new String[]{String.valueOf(id)});\r\n        if(check == -1)\r\n            return 0;\r\n        return 1;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/RoomDao.java b/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/RoomDao.java
+--- a/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/RoomDao.java	(revision 38d81681f34ecade78d16bfcecd81232d7e32b95)
++++ b/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/RoomDao.java	(date 1669740639545)
+@@ -66,7 +66,7 @@
+     }
+ 
+     //1: xóa thành công- 0: thất bại - -1: đang có trong bill hoặc room_product
+-    public int deleteProduct(int id){
++    public int deleteRoom(int id){
+         SQLiteDatabase sqLiteDatabase = myDatabase.getWritableDatabase();
+         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM ROOM_PRODUCT WHERE ROOM_ID = ?", new String[]{String.valueOf(id)});
+         if(cursor.getCount()!=0){
+Index: app/src/main/res/layout/item_room.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    android:orientation=\"vertical\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    android:padding=\"10dp\">\r\n    <androidx.cardview.widget.CardView\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        app:cardCornerRadius=\"20dp\"\r\n        app:cardElevation=\"10dp\"\r\n        android:layout_margin=\"10dp\">\r\n\r\n        <LinearLayout\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:background=\"#b2ffba\"\r\n            android:orientation=\"vertical\"\r\n            android:padding=\"10dp\">\r\n\r\n            <TextView\r\n                android:id=\"@+id/tv_Room_Name\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:layout_marginBottom=\"10dp\"\r\n                android:text=\"Tên phòng: \"\r\n                android:textColor=\"#000000\"\r\n                android:textSize=\"25dp\"\r\n                android:textStyle=\"bold\" />\r\n\r\n            <TextView\r\n                android:id=\"@+id/tv_Location\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:layout_marginBottom=\"5dp\"\r\n                android:text=\"Vị trí phòng: \"\r\n                android:textSize=\"16dp\" />\r\n\r\n            <TextView\r\n                android:id=\"@+id/tv_Type\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"Loại phòng: \"\r\n                android:textSize=\"16dp\" />\r\n\r\n            <TextView\r\n                android:id=\"@+id/tv_View\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"View phòng: \"\r\n                android:textSize=\"16dp\" />\r\n\r\n            <TextView\r\n                android:id=\"@+id/tv_Hour_Price\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"Giá giờ: \"\r\n                android:textSize=\"16dp\" />\r\n\r\n            <TextView\r\n                android:id=\"@+id/tv_Day_Price\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"Giá ngày: \"\r\n                android:textSize=\"16dp\" />\r\n\r\n            <Button\r\n                android:id=\"@+id/btn_Add_Note_Room\"\r\n                android:layout_width=\"wrap_content\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:layout_gravity=\"center\"\r\n                android:backgroundTint=\"#80cb8a\"\r\n                android:drawableLeft=\"@drawable/ic_add\"\r\n                android:text=\"Thêm ghi chú\" />\r\n        </LinearLayout>\r\n    </androidx.cardview.widget.CardView>\r\n</LinearLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/item_room.xml b/app/src/main/res/layout/item_room.xml
+--- a/app/src/main/res/layout/item_room.xml	(revision 38d81681f34ecade78d16bfcecd81232d7e32b95)
++++ b/app/src/main/res/layout/item_room.xml	(date 1669740639565)
+@@ -12,58 +12,84 @@
+         app:cardElevation="10dp"
+         android:layout_margin="10dp">
+ 
+-        <LinearLayout
++        <androidx.constraintlayout.widget.ConstraintLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:background="#b2ffba"
+-            android:orientation="vertical"
+             android:padding="10dp">
+ 
+             <TextView
+                 android:id="@+id/tv_Room_Name"
+-                android:layout_width="match_parent"
++                android:layout_width="0dp"
+                 android:layout_height="wrap_content"
+-                android:layout_marginBottom="10dp"
+                 android:text="Tên phòng: "
+                 android:textColor="#000000"
+                 android:textSize="25dp"
+-                android:textStyle="bold" />
++                android:textStyle="bold"
++                app:layout_constraintEnd_toEndOf="parent"
++                app:layout_constraintStart_toStartOf="parent"
++                app:layout_constraintTop_toTopOf="parent" />
+ 
+             <TextView
+                 android:id="@+id/tv_Location"
+-                android:layout_width="match_parent"
++                android:layout_width="0dp"
+                 android:layout_height="wrap_content"
+-                android:layout_marginBottom="5dp"
+                 android:text="Vị trí phòng: "
+-                android:textSize="16dp" />
++                android:textSize="16dp"
++                app:layout_constraintEnd_toStartOf="@+id/iv_DeleteRoom"
++                app:layout_constraintStart_toStartOf="parent"
++                app:layout_constraintTop_toBottomOf="@+id/tv_Room_Name" />
+ 
+             <TextView
+                 android:id="@+id/tv_Type"
+-                android:layout_width="match_parent"
++                android:layout_width="0dp"
+                 android:layout_height="wrap_content"
+                 android:text="Loại phòng: "
+-                android:textSize="16dp" />
++                android:textSize="16dp"
++                app:layout_constraintEnd_toStartOf="@+id/iv_DeleteRoom"
++                app:layout_constraintStart_toStartOf="parent"
++                app:layout_constraintTop_toBottomOf="@+id/tv_Location" />
+ 
+             <TextView
+                 android:id="@+id/tv_View"
+-                android:layout_width="match_parent"
++                android:layout_width="0dp"
+                 android:layout_height="wrap_content"
+                 android:text="View phòng: "
+-                android:textSize="16dp" />
++                android:textSize="16dp"
++                app:layout_constraintEnd_toStartOf="@+id/iv_DeleteRoom"
++                app:layout_constraintStart_toStartOf="parent"
++                app:layout_constraintTop_toBottomOf="@+id/tv_Type" />
+ 
+             <TextView
+                 android:id="@+id/tv_Hour_Price"
+-                android:layout_width="match_parent"
++                android:layout_width="0dp"
+                 android:layout_height="wrap_content"
+                 android:text="Giá giờ: "
+-                android:textSize="16dp" />
++                android:textSize="16dp"
++                app:layout_constraintEnd_toStartOf="@+id/iv_DeleteRoom"
++                app:layout_constraintStart_toStartOf="parent"
++                app:layout_constraintTop_toBottomOf="@+id/tv_View" />
+ 
+             <TextView
+                 android:id="@+id/tv_Day_Price"
+-                android:layout_width="match_parent"
++                android:layout_width="0dp"
+                 android:layout_height="wrap_content"
+                 android:text="Giá ngày: "
+-                android:textSize="16dp" />
++                android:textSize="16dp"
++                app:layout_constraintEnd_toStartOf="@+id/iv_DeleteRoom"
++                app:layout_constraintStart_toStartOf="parent"
++                app:layout_constraintTop_toBottomOf="@+id/tv_Hour_Price" />
++
++            <TextView
++                android:id="@+id/tv_Note"
++                android:layout_width="0dp"
++                android:layout_height="wrap_content"
++                android:text="Ghi chú: "
++                android:textSize="16dp"
++                android:visibility="invisible"
++                app:layout_constraintEnd_toStartOf="@+id/iv_DeleteRoom"
++                app:layout_constraintStart_toStartOf="parent"
++                app:layout_constraintTop_toBottomOf="@+id/tv_Day_Price" />
+ 
+             <Button
+                 android:id="@+id/btn_Add_Note_Room"
+@@ -72,7 +98,19 @@
+                 android:layout_gravity="center"
+                 android:backgroundTint="#80cb8a"
+                 android:drawableLeft="@drawable/ic_add"
+-                android:text="Thêm ghi chú" />
+-        </LinearLayout>
++                android:text="Thêm ghi chú"
++                app:layout_constraintEnd_toStartOf="@+id/iv_DeleteRoom"
++                app:layout_constraintStart_toStartOf="parent"
++                app:layout_constraintTop_toBottomOf="@+id/tv_Note"/>
++            <ImageView
++                android:id="@+id/iv_DeleteRoom"
++                android:layout_width="24dp"
++                android:layout_height="24dp"
++                android:layout_marginTop="10dp"
++                android:layout_marginEnd="20dp"
++                app:layout_constraintEnd_toEndOf="parent"
++                app:layout_constraintTop_toBottomOf="@+id/tv_Type"
++                app:srcCompat="@drawable/ic_delete_24" />
++        </androidx.constraintlayout.widget.ConstraintLayout>
+     </androidx.cardview.widget.CardView>
+ </LinearLayout>
+\ No newline at end of file
+Index: app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/RoomAdapter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package team1.fpoly.duan_n1_17303.Adapter;\r\n\r\nimport android.app.AlertDialog;\r\nimport android.app.Dialog;\r\nimport android.content.Context;\r\nimport android.content.DialogInterface;\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.ArrayAdapter;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.annotation.Nullable;\r\n\r\nimport java.util.ArrayList;\r\n\r\nimport team1.fpoly.duan_n1_17303.Dao.RoomDao;\r\nimport team1.fpoly.duan_n1_17303.Object.Room;\r\nimport team1.fpoly.duan_n1_17303.Object.Staff;\r\nimport team1.fpoly.duan_n1_17303.R;\r\n\r\npublic class RoomAdapter extends ArrayAdapter<Room> {\r\n    Context context;\r\n    ArrayList<Room> listRoom;\r\n    RoomDao roomDao;\r\n\r\n    TextView tv_Room_Name, tv_Location, tv_Type, tv_View, tv_Hour_Price, tv_Day_Price;\r\n\r\n    public RoomAdapter(Context context, ArrayList<Room> listRoom, RoomDao roomDao) {\r\n        super(context, 0, listRoom);\r\n        this.context = context;\r\n        this.listRoom = listRoom;\r\n        this.roomDao = roomDao;\r\n    }\r\n\r\n    @Override\r\n    public int getCount() {\r\n        if(!listRoom.isEmpty()) return listRoom.size();\r\n        return 0;\r\n    }\r\n    @NonNull\r\n    @Override\r\n    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {\r\n        return convertView;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/RoomAdapter.java b/app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/RoomAdapter.java
+--- a/app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/RoomAdapter.java	(revision 38d81681f34ecade78d16bfcecd81232d7e32b95)
++++ b/app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/RoomAdapter.java	(date 1669745003164)
+@@ -8,6 +8,9 @@
+ import android.view.View;
+ import android.view.ViewGroup;
+ import android.widget.ArrayAdapter;
++import android.widget.Button;
++import android.widget.EditText;
++import android.widget.ImageView;
+ import android.widget.TextView;
+ import android.widget.Toast;
+ 
+@@ -17,6 +20,7 @@
+ import java.util.ArrayList;
+ 
+ import team1.fpoly.duan_n1_17303.Dao.RoomDao;
++import team1.fpoly.duan_n1_17303.Object.Product;
+ import team1.fpoly.duan_n1_17303.Object.Room;
+ import team1.fpoly.duan_n1_17303.Object.Staff;
+ import team1.fpoly.duan_n1_17303.R;
+@@ -26,7 +30,9 @@
+     ArrayList<Room> listRoom;
+     RoomDao roomDao;
+ 
+-    TextView tv_Room_Name, tv_Location, tv_Type, tv_View, tv_Hour_Price, tv_Day_Price;
++    TextView tv_Room_Name, tv_Location, tv_Type, tv_View, tv_Hour_Price, tv_Day_Price, tv_Note;
++    ImageView iv_DeleteRoom;
++    Button btn_Add_Note_Room;
+ 
+     public RoomAdapter(Context context, ArrayList<Room> listRoom, RoomDao roomDao) {
+         super(context, 0, listRoom);
+@@ -43,6 +49,77 @@
+     @NonNull
+     @Override
+     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
++        if(convertView == null){
++            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_room, parent, false);
++        }
++        final Room room = listRoom.get(position);
++        if(room != null){
++            tv_Room_Name = convertView.findViewById(R.id.tv_Room_Name);
++            tv_Location = convertView.findViewById(R.id.tv_Location);
++            tv_Type = convertView.findViewById(R.id.tv_Type);
++            tv_View = convertView.findViewById(R.id.tv_View);
++            tv_Hour_Price = convertView.findViewById(R.id.tv_Hour_Price);
++            tv_Day_Price = convertView.findViewById(R.id.tv_Day_Price);
++            tv_Note = convertView.findViewById(R.id.tv_Note);
++            iv_DeleteRoom = convertView.findViewById(R.id.iv_DeleteRoom);
++
++            tv_Room_Name.setText("Tên phòng: " + room.getRoomName());
++            tv_Location.setText("Vị trí phòng: " + room.getRoomLocation());
++            tv_Type.setText("Loại phòng: " + room.getRoomType());
++            tv_View.setText("View phòng: " + room.getRoomView());
++            tv_Hour_Price.setText("Giá giờ: " + room.getHourPrice());
++            tv_Day_Price.setText("Giá ngày: " + room.getDayPrice());
++            if(!room.getNote().isEmpty()){
++                tv_Note.setVisibility(View.VISIBLE);
++                tv_Note.setText("Ghi chú: " + room.getNote());
++                btn_Add_Note_Room.setText("Sửa ghi chú");
++            }
++
++            iv_DeleteRoom.setOnClickListener(view -> {
++                AlertDialog.Builder builder = new AlertDialog.Builder(context);
++                builder.setTitle("Bạn có muốn xóa.");
++                builder.setMessage("Phòng " + room.getRoomName());
++                builder.setPositiveButton("Không", new DialogInterface.OnClickListener() {
++                    @Override
++                    public void onClick(DialogInterface dialog, int which) {
++                        dialog.dismiss();
++                    }
++                });
++                builder.setNegativeButton("Có", new DialogInterface.OnClickListener() {
++                    @Override
++                    public void onClick(DialogInterface dialog, int which) {
++                        listRoom.remove(room);
++                        notifyDataSetChanged();
++                        int check = roomDao.deleteRoom(room.getRoomId());
++                        switch (check){
++                            case 1:
++                                Toast.makeText(context.getApplicationContext(), "Xóa thành công",Toast.LENGTH_LONG).show();
++                                break;
++                            case -1:
++                                Toast.makeText(context.getApplicationContext(), "Phòng đã tồn tại trong hóa đơn. Không thể xóa",Toast.LENGTH_LONG).show();
++                                break;
++                            case 0:
++                                Toast.makeText(context.getApplicationContext(), "Xóa thất bại",Toast.LENGTH_LONG).show();
++                                break;
++                            default:
++                                break;
++                        }
++                    }
++                });
++                Dialog dialog = builder.create();
++                dialog.show();
++            });
++
++            btn_Add_Note_Room.setOnClickListener(view -> {
++                showInputNote(position);
++            });
++
++        }
++
+         return convertView;
+     }
++
++    private void showInputNote(int position) {
++
++    }
+ }
+Index: app/src/main/res/layout/item_add_note_room.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/item_add_note_room.xml b/app/src/main/res/layout/item_add_note_room.xml
+new file mode 100644
+--- /dev/null	(date 1669740639611)
++++ b/app/src/main/res/layout/item_add_note_room.xml	(date 1669740639611)
+@@ -0,0 +1,51 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="match_parent"
++    android:layout_height="wrap_content"
++    android:orientation="vertical"
++    android:padding="10dp"
++    android:layout_margin="20dp">
++    <androidx.appcompat.widget.Toolbar
++        android:id="@+id/toolbarCustomer"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:background="#b2ffba "
++        android:fitsSystemWindows="true"
++        android:minHeight="?attr/actionBarSize"
++        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
++
++        <ImageView
++            android:id="@+id/img_Back_Customer"
++            android:layout_width="30dp"
++            android:layout_height="30dp"
++            android:layout_gravity="left"
++            android:src="@drawable/ic_back" />
++
++        <TextView
++            android:id="@+id/tv_Title_Customer"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_gravity="center"
++            android:text="Thêm ghi chú"
++            android:textColor="#000000"
++            android:textSize="25dp"
++            android:textStyle="bold" />
++
++        <ImageView
++            android:id="@+id/img_Save_Customer"
++            android:layout_width="30dp"
++            android:layout_height="30dp"
++            android:layout_gravity="right"
++            android:layout_marginRight="10dp"
++            android:src="@drawable/ic_save" />
++    </androidx.appcompat.widget.Toolbar>
++    <EditText
++        android:id="@+id/ed_add_note"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:layout_margin="10dp"
++        android:layout_marginTop="30dp"
++        android:padding="10dp"
++        android:background="@drawable/custom_input"/>
++
++</LinearLayout>
+\ No newline at end of file
+Index: app/src/main/res/drawable/custom_input.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/drawable/custom_input.xml b/app/src/main/res/drawable/custom_input.xml
+new file mode 100644
+--- /dev/null	(date 1669740639602)
++++ b/app/src/main/res/drawable/custom_input.xml	(date 1669740639602)
+@@ -0,0 +1,10 @@
++<?xml version="1.0" encoding="utf-8"?>
++<selector xmlns:android="http://schemas.android.com/apk/res/android">
++    <item android:state_enabled="true">
++        <shape android:shape="rectangle">
++            <solid android:color="@color/white"/>
++            <corners android:radius="10dp"/>
++            <stroke android:color="#D3D3D3" android:width="1dp"/>
++        </shape>
++    </item>
++</selector>
+\ No newline at end of file

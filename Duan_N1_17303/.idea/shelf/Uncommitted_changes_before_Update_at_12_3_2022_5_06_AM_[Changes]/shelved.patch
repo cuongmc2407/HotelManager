@@ -1,0 +1,278 @@
+Index: app/src/main/java/team1/fpoly/duan_n1_17303/Dao/ProductRoomDAO.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package team1.fpoly.duan_n1_17303.Dao;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.content.ContentValues;\r\nimport android.content.Context;\r\nimport android.database.Cursor;\r\nimport android.database.sqlite.SQLiteDatabase;\r\n\r\nimport java.util.ArrayList;\r\n\r\nimport team1.fpoly.duan_n1_17303.Database.MyDatabase;\r\nimport team1.fpoly.duan_n1_17303.Object.Customer;\r\nimport team1.fpoly.duan_n1_17303.Object.Product;\r\nimport team1.fpoly.duan_n1_17303.Object.ProductRoom;\r\n\r\n@SuppressLint(\"Range\")\r\npublic class ProductRoomDAO {\r\n    SQLiteDatabase db;\r\n\r\n    public ProductRoomDAO(Context context){\r\n        MyDatabase myDatabase = new MyDatabase(context);\r\n        db = myDatabase.getWritableDatabase();\r\n    }\r\n\r\n    //Hiện thị dữ liệu\r\n    public ArrayList<ProductRoom> getDataProductRoom(){\r\n        ArrayList<ProductRoom> listProductRoom = new ArrayList<>();\r\n        String sql = \"SELECT * FROM ROOM_PRODUCT\";\r\n        Cursor cursor =db.rawQuery(sql, null);\r\n        while (cursor.moveToNext()){\r\n            ProductRoom productRoom = new ProductRoom();\r\n            productRoom.setProductId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(\"PRODUCT_ID\"))));\r\n            productRoom.setProductId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(\"ROOM_ID\"))));\r\n            productRoom.setProductRoomName(cursor.getString(cursor.getColumnIndex(\"PRODUCT_NAME\")));\r\n            productRoom.setProductRoomPrice(Integer.parseInt(cursor.getString(cursor.getColumnIndex(\"PRICE\"))));\r\n            productRoom.setProductRoomQuantity(Integer.parseInt(cursor.getString(cursor.getColumnIndex(\"QUANTITY\"))));\r\n            listProductRoom.add(productRoom);\r\n        }\r\n        return listProductRoom;\r\n    }\r\n\r\n    //thêm dl\r\n    public boolean insertProductRoom(ProductRoom productRoom){\r\n        ContentValues values = new ContentValues();\r\n        values.put(\"PRODUCT_ID\", productRoom.getProductId());\r\n        values.put(\"ROOM_ID\", productRoom.getRoomId());\r\n        values.put(\"PRODUCT_NAME\", productRoom.getProductRoomName());\r\n        values.put(\"PRICE\", productRoom.getProductRoomPrice());\r\n        values.put(\"QUANTITY\", productRoom.getProductRoomQuantity());\r\n        long check = db.insert(\"ROOM_PRODUCT\", null, values);\r\n        if(check == -1)\r\n            return false;\r\n        return true;\r\n    }\r\n\r\n    //sửa dl\r\n    public boolean updateProductRoom(ProductRoom productRoom){\r\n        ContentValues values = new ContentValues();\r\n        values.put(\"PRODUCT_ID\", productRoom.getProductId());\r\n        values.put(\"ROOM_ID\", productRoom.getRoomId());\r\n        values.put(\"PRODUCT_NAME\", productRoom.getProductRoomName());\r\n        values.put(\"PRICE\", productRoom.getProductRoomPrice());\r\n        values.put(\"QUANTITY\", productRoom.getProductRoomQuantity());\r\n        long check = db.update(\"ROOM_PRODUCT\",values,\"ROOM_ID = ?\", new String[]{String.valueOf(productRoom.getRoomId())});\r\n        if(check==-1)\r\n            return false;\r\n        return true;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/ProductRoomDAO.java b/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/ProductRoomDAO.java
+--- a/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/ProductRoomDAO.java	(revision 43469307c5d03e083c09894c7b9607b804a1a34f)
++++ b/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/ProductRoomDAO.java	(date 1669971661744)
+@@ -39,6 +39,20 @@
+         return listProductRoom;
+     }
+ 
++    public ArrayList<ProductRoom> getDataProductRoomByID(int ROOM_ID){
++        ArrayList<ProductRoom> listProductRoom = new ArrayList<>();
++        Cursor cursor =db.rawQuery("SELECT * FROM ROOM_PRODUCT WHERE ROOM_ID=?", new String[]{String.valueOf(ROOM_ID)});
++        while (cursor.moveToNext()){
++            ProductRoom productRoom = new ProductRoom();
++            productRoom.setProductId(Integer.parseInt(cursor.getString(cursor.getColumnIndex("PRODUCT_ID"))));
++            productRoom.setProductId(Integer.parseInt(cursor.getString(cursor.getColumnIndex("ROOM_ID"))));
++            productRoom.setProductRoomName(cursor.getString(cursor.getColumnIndex("PRODUCT_NAME")));
++            productRoom.setProductRoomPrice(Integer.parseInt(cursor.getString(cursor.getColumnIndex("PRICE"))));
++            productRoom.setProductRoomQuantity(Integer.parseInt(cursor.getString(cursor.getColumnIndex("QUANTITY"))));
++            listProductRoom.add(productRoom);
++        }
++        return listProductRoom;
++    }
+     //thêm dl
+     public boolean insertProductRoom(ProductRoom productRoom){
+         ContentValues values = new ContentValues();
+Index: app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/RoomAdapter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package team1.fpoly.duan_n1_17303.Adapter;\r\n\r\nimport android.app.AlertDialog;\r\nimport android.app.Dialog;\r\nimport android.content.Context;\r\nimport android.content.DialogInterface;\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.ArrayAdapter;\r\nimport android.widget.Button;\r\nimport android.widget.EditText;\r\nimport android.widget.ImageView;\r\nimport android.widget.ListView;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.annotation.Nullable;\r\n\r\nimport java.util.ArrayList;\r\n\r\nimport team1.fpoly.duan_n1_17303.Dao.ProductDao;\r\nimport team1.fpoly.duan_n1_17303.Dao.ProductRoomDAO;\r\nimport team1.fpoly.duan_n1_17303.Dao.RoomDao;\r\nimport team1.fpoly.duan_n1_17303.Object.Product;\r\nimport team1.fpoly.duan_n1_17303.Object.ProductRoom;\r\nimport team1.fpoly.duan_n1_17303.Object.Room;\r\nimport team1.fpoly.duan_n1_17303.Object.Staff;\r\nimport team1.fpoly.duan_n1_17303.R;\r\nimport team1.fpoly.duan_n1_17303.Tools.ItemClickListener;\r\n\r\npublic class RoomAdapter extends ArrayAdapter<Room> {\r\n    Context context;\r\n    ArrayList<Room> listRoom;\r\n    ArrayList<Product> listProduct;\r\n    RoomDao roomDao;\r\n\r\n    TextView tv_Room_Name, tv_Location, tv_Type, tv_View, tv_Hour_Price, tv_Day_Price, tv_Note;\r\n    ImageView iv_DeleteRoom, iv_Room_Product;\r\n    Button btn_Add_Note_Room;\r\n\r\n    public RoomAdapter(Context context, ArrayList<Room> listRoom, RoomDao roomDao) {\r\n        super(context, 0, listRoom);\r\n        this.context = context;\r\n        this.listRoom = listRoom;\r\n        this.roomDao = roomDao;\r\n    }\r\n\r\n    @Override\r\n    public int getCount() {\r\n        if (!listRoom.isEmpty()) return listRoom.size();\r\n        return 0;\r\n    }\r\n\r\n    @NonNull\r\n    @Override\r\n    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {\r\n        if (convertView == null) {\r\n            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_room, parent, false);\r\n        }\r\n        final Room room = listRoom.get(position);\r\n        if (room != null) {\r\n\r\n\r\n            tv_Room_Name = convertView.findViewById(R.id.tv_Room_Name);\r\n            tv_Location = convertView.findViewById(R.id.tv_Location);\r\n            tv_Type = convertView.findViewById(R.id.tv_Type);\r\n            tv_View = convertView.findViewById(R.id.tv_View);\r\n            tv_Hour_Price = convertView.findViewById(R.id.tv_Hour_Price);\r\n            tv_Day_Price = convertView.findViewById(R.id.tv_Day_Price);\r\n          //  tv_Note = convertView.findViewById(R.id.tv_Note);\r\n            iv_DeleteRoom = convertView.findViewById(R.id.iv_DeleteRoom);\r\n            iv_Room_Product = convertView.findViewById(R.id.iv_Room_Product);\r\n//            btn_Add_Note_Room = convertView.findViewById(R.id.btn_Add_Note_Room);\r\n\r\n            tv_Room_Name.setText(\"Tên phòng: \" + room.getRoomName());\r\n            tv_Location.setText(\"Vị trí phòng: \" + room.getRoomLocation());\r\n            tv_Type.setText(\"Loại phòng: \" + room.getRoomType());\r\n            tv_View.setText(\"View phòng: \" + room.getRoomView());\r\n            tv_Hour_Price.setText(\"Giá giờ: \" + room.getHourPrice());\r\n            tv_Day_Price.setText(\"Giá ngày: \" + room.getDayPrice());\r\n        //       if (room.getNote() != null) {\r\n        //         tv_Note.setVisibility(View.VISIBLE);\r\n        //         tv_Note.setText(\"Ghi chú: \" + room.getNote());\r\n        //        btn_Add_Note_Room.setText(\"Sửa ghi chú\");\r\n        //    }\r\n\r\n            iv_DeleteRoom.setOnClickListener(view -> {\r\n                AlertDialog.Builder builder = new AlertDialog.Builder(context);\r\n                builder.setTitle(\"Bạn có muốn xóa.\");\r\n                builder.setMessage(\"Phòng \" + room.getRoomName());\r\n                builder.setPositiveButton(\"Không\", new DialogInterface.OnClickListener() {\r\n                    @Override\r\n                    public void onClick(DialogInterface dialog, int which) {\r\n                        dialog.dismiss();\r\n                    }\r\n                });\r\n                builder.setNegativeButton(\"Có\", new DialogInterface.OnClickListener() {\r\n                    @Override\r\n                    public void onClick(DialogInterface dialog, int which) {\r\n                        listRoom.remove(room);\r\n                        notifyDataSetChanged();\r\n                        int check = roomDao.deleteRoom(room.getRoomId());\r\n                        switch (check) {\r\n                            case 1:\r\n                                Toast.makeText(context.getApplicationContext(), \"Xóa thành công\", Toast.LENGTH_LONG).show();\r\n                                break;\r\n                            case -1:\r\n                                Toast.makeText(context.getApplicationContext(), \"Phòng đã tồn tại trong hóa đơn. Không thể xóa\", Toast.LENGTH_LONG).show();\r\n                                break;\r\n                            case 0:\r\n                                Toast.makeText(context.getApplicationContext(), \"Xóa thất bại\", Toast.LENGTH_LONG).show();\r\n                                break;\r\n                            default:\r\n                                break;\r\n                        }\r\n                    }\r\n                });\r\n                Dialog dialog = builder.create();\r\n                dialog.show();\r\n            });\r\n\r\n        //    btn_Add_Note_Room.setOnClickListener(view -> {\r\n        //        showInputNote(position);\r\n        //    });\r\n\r\n            iv_Room_Product.setOnClickListener(v -> {\r\n                showDialogProductRoom(position);\r\n            });\r\n\r\n        }\r\n\r\n        return convertView;\r\n    }\r\n\r\n    private void showInputNote(int position) {\r\n        Dialog dialog = new Dialog(context);\r\n        dialog.setContentView(R.layout.dialog_update_note);\r\n        TextView tv_Title_Room = dialog.findViewById(R.id.tv_Title_Room);\r\n        EditText ed_Note = dialog.findViewById(R.id.ed_Note);\r\n        ImageView img_Back_Room = dialog.findViewById(R.id.img_Back_Room);\r\n        ImageView img_Save_Room = dialog.findViewById(R.id.img_Save_Room);\r\n\r\n        if (listRoom.get(position).getNote() != null) {\r\n            tv_Title_Room.setText(\"Sửa ghi chú\");\r\n        }\r\n        ed_Note.setText(listRoom.get(position).getNote());\r\n\r\n        img_Back_Room.setOnClickListener(view -> {\r\n            dialog.dismiss();\r\n        });\r\n\r\n        img_Save_Room.setOnClickListener(view -> {\r\n            Room room = listRoom.get(position);\r\n\r\n            room.setNote(ed_Note.getText().toString());\r\n\r\n            roomDao.updateRoom(room);\r\n            notifyDataSetChanged();\r\n            dialog.dismiss();\r\n        });\r\n        dialog.show();\r\n    }\r\n\r\n    private void showDialogProductRoom(int possition){\r\n        Dialog dialog = new Dialog(context);\r\n        dialog.setContentView(R.layout.dialog_product_room);\r\n        TextView tv_Title_Product_Room = dialog.findViewById(R.id.tv_Title_Product_Room);\r\n        ListView lv_Product_Room = dialog.findViewById(R.id.lv_Product_Room);\r\n        Button btn_Save_Product_Room = dialog.findViewById(R.id.btn_Save_Product_Room);\r\n        Button btn_Cancel_Product_Room = dialog.findViewById(R.id.btn_Cancel_Product_Room);\r\n\r\n        Room room = listRoom.get(possition);\r\n        tv_Title_Product_Room.setText(\"Sản phẩm phòng \" + room.getRoomName());\r\n        ProductDao productDao = new ProductDao(context);\r\n        ProductRoomDAO productRoomDAO = new ProductRoomDAO(context);\r\n        listProduct = productDao.getListProduct();\r\n        ProductRoomAdapter productRoomAdapter = new ProductRoomAdapter(context, listProduct, productDao);\r\n        lv_Product_Room.setAdapter(productRoomAdapter);\r\n\r\n        btn_Cancel_Product_Room.setOnClickListener(v -> {\r\n            dialog.dismiss();\r\n        });\r\n        dialog.show();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/RoomAdapter.java b/app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/RoomAdapter.java
+--- a/app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/RoomAdapter.java	(revision 43469307c5d03e083c09894c7b9607b804a1a34f)
++++ b/app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/RoomAdapter.java	(date 1669972021812)
+@@ -164,24 +164,6 @@
+     }
+ 
+     private void showDialogProductRoom(int possition){
+-        Dialog dialog = new Dialog(context);
+-        dialog.setContentView(R.layout.dialog_product_room);
+-        TextView tv_Title_Product_Room = dialog.findViewById(R.id.tv_Title_Product_Room);
+-        ListView lv_Product_Room = dialog.findViewById(R.id.lv_Product_Room);
+-        Button btn_Save_Product_Room = dialog.findViewById(R.id.btn_Save_Product_Room);
+-        Button btn_Cancel_Product_Room = dialog.findViewById(R.id.btn_Cancel_Product_Room);
+-
+-        Room room = listRoom.get(possition);
+-        tv_Title_Product_Room.setText("Sản phẩm phòng " + room.getRoomName());
+-        ProductDao productDao = new ProductDao(context);
+-        ProductRoomDAO productRoomDAO = new ProductRoomDAO(context);
+-        listProduct = productDao.getListProduct();
+-        ProductRoomAdapter productRoomAdapter = new ProductRoomAdapter(context, listProduct, productDao);
+-        lv_Product_Room.setAdapter(productRoomAdapter);
+-
+-        btn_Cancel_Product_Room.setOnClickListener(v -> {
+-            dialog.dismiss();
+-        });
+-        dialog.show();
++        //xử lý thêm product_room dao ở đâyxx
+     }
+ }
+Index: app/src/main/res/layout/dialog_product_room.xml
+===================================================================
+diff --git a/app/src/main/res/layout/dialog_product_room.xml b/app/src/main/res/layout/dialog_product_room.xml
+deleted file mode 100644
+--- a/app/src/main/res/layout/dialog_product_room.xml	(revision 43469307c5d03e083c09894c7b9607b804a1a34f)
++++ /dev/null	(revision 43469307c5d03e083c09894c7b9607b804a1a34f)
+@@ -1,49 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+-    xmlns:app="http://schemas.android.com/apk/res-auto"
+-    android:orientation="vertical"
+-    android:layout_width="match_parent"
+-    android:layout_height="match_parent"
+-    android:layout_gravity="center">
+-
+-    <TextView
+-        android:id="@+id/tv_Title_Product_Room"
+-        android:layout_width="match_parent"
+-        android:layout_height="wrap_content"
+-        android:gravity="center"
+-        android:padding="8dp"
+-        android:background="#b2ffba"
+-        android:text="Sản phẩm phòng "
+-        android:textStyle="bold"
+-        android:textSize="20dp"/>
+-
+-    <ListView
+-        android:id="@+id/lv_Product_Room"
+-        android:layout_width="450dp"
+-        android:layout_height="wrap_content" />
+-
+-    <LinearLayout
+-        android:layout_width="match_parent"
+-        android:layout_height="wrap_content"
+-        android:gravity="center"
+-        android:layout_marginTop="10dp"
+-        android:orientation="horizontal">
+-        <Button
+-            android:id="@+id/btn_Save_Product_Room"
+-            android:layout_width="100dp"
+-            android:layout_height="wrap_content"
+-            android:layout_marginRight="40dp"
+-            android:backgroundTint="#80cb8a"
+-            android:text="Lưu"
+-           />
+-        <Button
+-            android:id="@+id/btn_Cancel_Product_Room"
+-            android:layout_width="wrap_content"
+-            android:layout_height="wrap_content"
+-            android:layout_marginLeft="40dp"
+-            android:backgroundTint="#80cb8a"
+-            android:text="Thoát"
+-      />
+-    </LinearLayout>
+-
+-</LinearLayout>
+\ No newline at end of file
+Index: app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/DialogAddProductAdapter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/DialogAddProductAdapter.java b/app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/DialogAddProductAdapter.java
+new file mode 100644
+--- /dev/null	(date 1669971325857)
++++ b/app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/DialogAddProductAdapter.java	(date 1669971325857)
+@@ -0,0 +1,55 @@
++package team1.fpoly.duan_n1_17303.Adapter;
++
++import android.content.Context;
++import android.view.LayoutInflater;
++import android.view.View;
++import android.view.ViewGroup;
++import android.widget.ArrayAdapter;
++import android.widget.EditText;
++import android.widget.ImageView;
++import android.widget.TextView;
++
++import androidx.annotation.NonNull;
++import androidx.annotation.Nullable;
++
++import java.util.ArrayList;
++
++import team1.fpoly.duan_n1_17303.Dao.ProductDao;
++import team1.fpoly.duan_n1_17303.Dao.ProductRoomDAO;
++import team1.fpoly.duan_n1_17303.Object.Product;
++import team1.fpoly.duan_n1_17303.Object.ProductRoom;
++import team1.fpoly.duan_n1_17303.R;
++
++public class DialogAddProductAdapter extends ArrayAdapter<Product> {
++    Context context;
++    ArrayList<ProductRoom> listProduct;
++    ProductDao productDao;
++    ProductRoomDAO roomProductDao;
++
++    public DialogAddProductAdapter(Context context, ArrayList<Product> listProduct,ProductDao productDao,ProductRoomDAO roomProductDao){
++        super(context,0,listProduct);
++
++    }
++
++    @Override
++    public int getCount() {
++        if (!listProduct.isEmpty()) return listProduct.size();
++        return 0;
++    }
++
++    @NonNull
++    @Override
++    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
++        if(convertView == null){
++            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_dialog_add_product, parent, false);
++        }
++        TextView product_name = convertView.findViewById(R.id.item_dialog_add_product_textView_name);
++        ImageView reduce = convertView.findViewById(R.id.item_dialog_add_product_image_view_reduce);
++        ImageView increase = convertView.findViewById(R.id.item_dialog_add_product_image_view_increase);
++        EditText quality = convertView.findViewById(R.id.item_dialog_add_product_editText_quality);
++
++
++
++        return super.getView(position, convertView, parent);
++    }
++}
+Index: app/src/main/res/layout/item_dialog_add_product.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/item_dialog_add_product.xml b/app/src/main/res/layout/item_dialog_add_product.xml
+new file mode 100644
+--- /dev/null	(date 1669971107850)
++++ b/app/src/main/res/layout/item_dialog_add_product.xml	(date 1669971107850)
+@@ -0,0 +1,48 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="match_parent"
++    android:orientation="horizontal"
++    android:layout_height="100dp"
++    android:background="#b2ffba"
++
++    android:gravity="center_vertical">
++
++    <TextView
++        android:id="@+id/item_dialog_add_product_textView_name"
++        android:layout_marginLeft="30dp"
++        android:textSize="30sp"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:text="Sản phẩm 1"/>
++    <LinearLayout
++        android:layout_marginRight="20dp"
++        android:orientation="horizontal"
++        android:gravity="right"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        >
++    <ImageView
++        android:id="@+id/item_dialog_add_product_image_view_reduce"
++        android:layout_gravity="center"
++        android:layout_width="40dp"
++        android:layout_height="40dp"
++        android:src="@drawable/ic_reduce"
++        />
++    <EditText
++        android:id="@+id/item_dialog_add_product_editText_quality"
++        android:layout_marginLeft="20dp"
++        android:layout_marginRight="20dp"
++        android:textSize="30sp"
++        android:layout_width="wrap_content"
++        android:text="0"
++        android:layout_height="wrap_content"
++        />
++    <ImageView
++        android:id="@+id/item_dialog_add_product_image_view_increase"
++        android:layout_gravity="center"
++        android:layout_width="40dp"
++        android:layout_height="40dp"
++        android:src="@drawable/ic_sum"
++        />
++    </LinearLayout>
++</LinearLayout>
+\ No newline at end of file
+Index: app/src/main/res/layout/dialog_add_product.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/dialog_add_product.xml b/app/src/main/res/layout/dialog_add_product.xml
+new file mode 100644
+--- /dev/null	(date 1669968603655)
++++ b/app/src/main/res/layout/dialog_add_product.xml	(date 1669968603655)
+@@ -0,0 +1,19 @@
++<?xml version="1.0" encoding="utf-8"?>
++<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
++             android:layout_width="match_parent"
++             android:layout_height="match_parent">
++    <ListView
++        android:id="@+id/dialog_add_product_listview"
++        android:layout_width="match_parent"
++        android:layout_margin="20dp"
++        android:layout_height="wrap_content"
++        />
++    <Button
++        android:id="@+id/dialog_add_product_button_save"
++        android:layout_gravity="bottom|center"
++        android:layout_margin="20dp"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:text="Lưu"
++        />
++</androidx.coordinatorlayout.widget.CoordinatorLayout>
+\ No newline at end of file

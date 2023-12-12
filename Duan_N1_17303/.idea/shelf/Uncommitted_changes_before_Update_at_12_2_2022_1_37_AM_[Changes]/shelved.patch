@@ -1,0 +1,895 @@
+Index: app/src/main/java/team1/fpoly/duan_n1_17303/Tools/AddBillFragment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package team1.fpoly.duan_n1_17303.Tools;\r\n\r\nimport android.os.Bundle;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.annotation.Nullable;\r\nimport androidx.fragment.app.Fragment;\r\n\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.Spinner;\r\n\r\nimport team1.fpoly.duan_n1_17303.R;\r\n\r\npublic class AddBillFragment extends Fragment {\r\n    Spinner add_Customer_Spinner;\r\n    Spinner add_Room_Spinner;\r\n    public AddBillFragment() {\r\n    }\r\n    public static AddBillFragment newInstance() {\r\n        AddBillFragment fragment = new AddBillFragment();\r\n        return fragment;\r\n    }\r\n\r\n    @Override\r\n    public void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n    }\r\n\r\n    @Override\r\n    public View onCreateView(LayoutInflater inflater, ViewGroup container,\r\n                             Bundle savedInstanceState) {\r\n        // Inflate the layout for this fragment\r\n        return inflater.inflate(R.layout.fragment_add_bill, container, false);\r\n    }\r\n\r\n    @Override\r\n    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {\r\n        super.onViewCreated(view, savedInstanceState);\r\n\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/team1/fpoly/duan_n1_17303/Tools/AddBillFragment.java b/app/src/main/java/team1/fpoly/duan_n1_17303/Tools/AddBillFragment.java
+--- a/app/src/main/java/team1/fpoly/duan_n1_17303/Tools/AddBillFragment.java	(revision 462ef3147c0b40ebb8b94f60be1c9b9d27683c8d)
++++ b/app/src/main/java/team1/fpoly/duan_n1_17303/Tools/AddBillFragment.java	(date 1669918927827)
+@@ -1,21 +1,62 @@
+ package team1.fpoly.duan_n1_17303.Tools;
+ 
++import android.app.Dialog;
++import android.content.Intent;
+ import android.os.Bundle;
+ 
+ import androidx.annotation.NonNull;
+ import androidx.annotation.Nullable;
++import androidx.appcompat.app.ActionBar;
+ import androidx.fragment.app.Fragment;
++import androidx.fragment.app.FragmentManager;
+ 
+ import android.view.LayoutInflater;
+ import android.view.View;
+ import android.view.ViewGroup;
++import android.widget.AdapterView;
++import android.widget.ArrayAdapter;
++import android.widget.Button;
++import android.widget.DatePicker;
++import android.widget.ImageView;
+ import android.widget.Spinner;
++import android.widget.TextView;
++import android.widget.TimePicker;
++import android.widget.Toast;
++
++import java.text.ParseException;
++import java.text.SimpleDateFormat;
++import java.util.ArrayList;
++import java.util.Date;
+ 
++
++import team1.fpoly.duan_n1_17303.Dao.BillDao;
++import team1.fpoly.duan_n1_17303.Dao.CustomerDao;
++import team1.fpoly.duan_n1_17303.Dao.RoomDao;
++import team1.fpoly.duan_n1_17303.Fragment.BillFragment;
++import team1.fpoly.duan_n1_17303.MainActivity;
++import team1.fpoly.duan_n1_17303.Object.Bill;
++import team1.fpoly.duan_n1_17303.Object.Customer;
++import team1.fpoly.duan_n1_17303.Object.Room;
+ import team1.fpoly.duan_n1_17303.R;
+ 
+ public class AddBillFragment extends Fragment {
+-    Spinner add_Customer_Spinner;
+-    Spinner add_Room_Spinner;
++    Spinner add_Customer_Spinner;Spinner add_Room_Spinner;
++    TextView date_picked_day_in;
++    ImageView date_pick_day_in;
++    TextView date_picked_day_out;
++    ImageView date_pick_day_out;
++    TextView time_picked_hour_in;
++    ImageView time_pick_hour_in;
++    TextView time_picked_hour_out;
++    ImageView time_pick_hour_out;
++    FragmentManager fm;
++    team1.fpoly.duan_n1_17303.Dao.CustomerDao dao_customer;
++    team1.fpoly.duan_n1_17303.Dao.RoomDao dao_room;
++    int customer_id,room_id,staff_id;
++    BillFragment billFragment;
++    BillDao dao_bill;
++
++
+     public AddBillFragment() {
+     }
+     public static AddBillFragment newInstance() {
+@@ -38,6 +79,232 @@
+     @Override
+     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+         super.onViewCreated(view, savedInstanceState);
++        Intent it = getActivity().getIntent();
++        staff_id = it.getIntExtra("id",0);
++        load_data();fm = getActivity().getSupportFragmentManager();
++        ImageView iv_bill_back = view.findViewById(R.id.img_Back_Bill);
++        ImageView iv_bill_save = view.findViewById(R.id.img_Save_Bill);
++        billFragment = new BillFragment();
++        date_picked_day_in = view.findViewById(R.id.fragmentAddBill_EditText_DateCheckIn);
++        date_picked_day_in.setEnabled(false);
++        date_picked_day_out = view.findViewById(R.id.fragmentAddBill_EditText_DateCheckOut);
++        date_picked_day_out.setEnabled(false);
++        date_pick_day_in = view.findViewById(R.id.fragmentAddBill_ImageView_DateCheckIn_Picker);
++        date_pick_day_out = view.findViewById(R.id.fragmentAddBill_ImageView_DateCheckOut_Picker);
++        date_pick_day_in.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                Dialog dialog = new Dialog(getActivity());
++                dialog.setContentView(R.layout.dialog_date_picker);
++                DatePicker datePicker = (DatePicker) dialog.findViewById(R.id.dialog_date_picker_DatePicker);
++                Button btnSubmit = dialog.findViewById(R.id.dialog_date_picker_buttonSubmit);
++                btnSubmit.setOnClickListener(new View.OnClickListener() {
++                    @Override
++                    public void onClick(View v) {
++                        String	day	=String.valueOf(datePicker.getDayOfMonth());
++                        String	month =String.valueOf(datePicker.getMonth());
++                        String	year =String.valueOf(datePicker.getYear());
++                        String date_picked = day +"/" + month +"/" + year;
++                        date_picked_day_in.setText(date_picked);
++                        dialog.dismiss();
++                    }
++                });
++                dialog.show();
++            }
++        });
++        date_pick_day_out.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                Dialog dialog = new Dialog(getActivity());
++                dialog.setContentView(R.layout.dialog_date_picker);
++                DatePicker datePicker = (DatePicker) dialog.findViewById(R.id.dialog_date_picker_DatePicker);
++                Button btnSubmit = dialog.findViewById(R.id.dialog_date_picker_buttonSubmit);
++                btnSubmit.setOnClickListener(new View.OnClickListener() {
++                    @Override
++                    public void onClick(View v) {
++                        String	day	=String.valueOf(datePicker.getDayOfMonth());
++                        String	month =String.valueOf(datePicker.getMonth());
++                        String	year =String.valueOf(datePicker.getYear());
++                        String date_picked = day +"/" + month +"/" + year;
++                        date_picked_day_out.setText(date_picked);
++                        dialog.dismiss();
++                    }
++                });
++                dialog.show();
++            }
++        });
++
++        time_picked_hour_in = view.findViewById(R.id.fragmentAddBill_EditText_HourCheckIn);;
++        time_picked_hour_in.setEnabled(false);
++        time_pick_hour_in= view.findViewById(R.id.fragmentAddBill_ImageView_HourCheckIn_Picker);;
++        time_picked_hour_out= view.findViewById(R.id.fragmentAddBill_EditText_HourCheckOut);;
++        time_picked_hour_out.setEnabled(false);
++        time_pick_hour_out= view.findViewById(R.id.fragmentAddBill_ImageView_HourCheckOut_Picker);;
++
++        time_pick_hour_in.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                Dialog dialog = new Dialog(getActivity());
++                dialog.setContentView(R.layout.dialog_time_picker);
++                TimePicker timePicker = (TimePicker) dialog.findViewById(R.id.dialog_time_picker_TimePicker);
++                timePicker.setIs24HourView(true);
++                Button btnSubmit = dialog.findViewById(R.id.dialog_time_picker_buttonSubmit);
++                btnSubmit.setOnClickListener(new View.OnClickListener() {
++                    @Override
++                    public void onClick(View v) {
++                        String	hour=String.valueOf(timePicker.getHour());
++                        String	minute =String.valueOf(timePicker.getMinute());
++
++                        String time_picked = hour +":"+minute;
++                        time_picked_hour_in.setText(time_picked);
++                        dialog.dismiss();
++                    }
++                });
++                dialog.show();
++            }
++        });
++        time_pick_hour_out.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                Dialog dialog = new Dialog(getActivity());
++                dialog.setContentView(R.layout.dialog_time_picker);
++                TimePicker timePicker = (TimePicker) dialog.findViewById(R.id.dialog_time_picker_TimePicker);
++                timePicker.setIs24HourView(true);
++                Button btnSubmit = dialog.findViewById(R.id.dialog_time_picker_buttonSubmit);
++                btnSubmit.setOnClickListener(new View.OnClickListener() {
++                    @Override
++                    public void onClick(View v) {
++                        String	hour=String.valueOf(timePicker.getHour());
++                        String	minute =String.valueOf(timePicker.getMinute());
++
++                        String time_picked = hour +":"+minute;
++                        time_picked_hour_out.setText(time_picked);
++                        dialog.dismiss();
++                    }
++                });
++                dialog.show();
++            }
++        });
++
++        iv_bill_back.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                MainActivity mainActivity = (MainActivity) getActivity();
++                ActionBar actionBar = mainActivity.getSupportActionBar();
++                actionBar.show();
++                fm.beginTransaction().replace(R.id.frameLayout, billFragment).commit();
++            }
++        });
++        iv_bill_save.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                save_bill();
++            }
++        });
++
++    }
++
++    private void save_bill() {
++        dao_bill = new BillDao(getActivity());
++        Bill b = new Bill();
+ 
++        String dayIn = date_picked_day_in.getText().toString();
++        String dayOut = date_picked_day_out.getText().toString();
++        String hourIn = time_picked_hour_in.getText().toString();
++        String hourOut = time_picked_hour_out.getText().toString();
++        if (dayIn.isEmpty()||dayOut.isEmpty()||hourIn.isEmpty()||hourOut.isEmpty()){
++            Toast.makeText(getActivity(), "Bạn phải nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
++            return;
++        }
++        if (!checkdate(dayIn,hourIn,dayOut,hourOut)) {
++            Toast.makeText(getActivity(), "Ngày giờ đi sau ngày giờ đến", Toast.LENGTH_SHORT).show();
++            return;
++        }
++        b.setCustomerId(customer_id);
++        b.setRoomId(room_id);
++        b.setStaffId(staff_id);
++        b.setDateCheckIn(dayIn);
++        b.setDateCheckOut(dayOut);
++        b.setTimeCheckIn(hourIn);
++        b.setTimeCheckOut(hourOut);
++
++        if (dao_bill.insertBill(b)) {
++            Toast.makeText(getActivity(), "Thêm khách hàng thành công", Toast.LENGTH_SHORT).show();
++        } else {
++            Toast.makeText(getActivity(), "Thêm khách hàng thất bại", Toast.LENGTH_SHORT).show();
++        }
++        MainActivity mainActivity = (MainActivity) getActivity();
++        ActionBar actionBar = mainActivity.getSupportActionBar();
++        actionBar.show();
++        fm.beginTransaction().replace(R.id.frameLayout, billFragment).commit();
++
++    }
++
++    private void load_data(){
++        dao_customer= new CustomerDao(getContext());
++        dao_room= new RoomDao(getContext());
++        ArrayList<Customer> liCustomer = dao_customer.getDataCustomer();
++        String[] customerListString = new String[liCustomer.size()];
++        for (int i=0;i<liCustomer.size();i++){
++            customerListString[i]=String.valueOf(liCustomer.get(i).getCustomerId());
++        }
++        ArrayList<Room> liRoom = dao_room.getListRoom();
++        String[] roomListString = new String[liRoom.size()];
++        for (int i=0;i<liRoom.size();i++){
++            roomListString[i]=String.valueOf(liRoom.get(i).getRoomId());
++        }
++        {
++            add_Customer_Spinner = (Spinner) getActivity().findViewById(R.id.spinner_Bill_Customer);
++            ArrayAdapter<CharSequence> adapter_Customer_Spinner = new ArrayAdapter<CharSequence>(getContext(),
++                    android.R.layout.simple_spinner_item,customerListString );
++            adapter_Customer_Spinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
++            add_Customer_Spinner.setAdapter(adapter_Customer_Spinner);
++            add_Customer_Spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
++                @Override
++                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
++                    customer_id = Integer.parseInt(customerListString[position]);
++                }
++
++                @Override
++                public void onNothingSelected(AdapterView<?> parent) {
++                    customer_id = Integer.parseInt(customerListString[0]);
++                }
++            });
++        }
++        {
++            add_Room_Spinner = (Spinner) getActivity().findViewById(R.id.spinner_Bill_Room);
++            ArrayAdapter<CharSequence> adapter_Room_Spinner = new ArrayAdapter<CharSequence>(getContext(),
++                    android.R.layout.simple_spinner_item,roomListString );
++            adapter_Room_Spinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
++            add_Room_Spinner.setAdapter(adapter_Room_Spinner);
++            add_Room_Spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
++                @Override
++                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
++                    room_id = Integer.parseInt(roomListString[position]);
++                }
++
++                @Override
++                public void onNothingSelected(AdapterView<?> parent) {
++                    room_id = Integer.parseInt(roomListString[0]);
++                }
++            });
++        }
++
++    }
++    private boolean checkdate(String dayIn,String hourIn,String dayOut,String hourOut){
++        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
++        String timeIn = dayIn +" "+hourIn;
++        String timeOut = dayOut +" "+hourOut;
++        Date dateIn = null;Date dateOut = null;
++        try {
++            dateIn = dateFormat.parse(timeIn);
++            dateOut = dateFormat.parse(timeOut);
++        } catch (ParseException e) {
++            e.printStackTrace();
++        }
++
++        if (dateIn.getTime()<dateOut.getTime()) return true;
++
++        return false;
+     }
+ }
+\ No newline at end of file
+Index: app/src/main/java/team1/fpoly/duan_n1_17303/Fragment/BillFragment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package team1.fpoly.duan_n1_17303.Fragment;\r\n\r\nimport android.os.Bundle;\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.ListView;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.annotation.Nullable;\r\nimport androidx.fragment.app.Fragment;\r\n\r\nimport com.google.android.material.floatingactionbutton.FloatingActionButton;\r\n\r\nimport team1.fpoly.duan_n1_17303.R;\r\n\r\n\r\npublic class BillFragment extends Fragment {\r\n\r\n    ListView lv_Bill;\r\n    FloatingActionButton fl_Add_Bill;\r\n    @Override\r\n    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {\r\n        return inflater.inflate(R.layout.fragment_bill, container, false);\r\n    }\r\n\r\n    @Override\r\n    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {\r\n        super.onViewCreated(view, savedInstanceState);\r\n\r\n        lv_Bill = view.findViewById(R.id.lv_Bill);\r\n        fl_Add_Bill = view.findViewById(R.id.fl_Add_Bill);\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/team1/fpoly/duan_n1_17303/Fragment/BillFragment.java b/app/src/main/java/team1/fpoly/duan_n1_17303/Fragment/BillFragment.java
+--- a/app/src/main/java/team1/fpoly/duan_n1_17303/Fragment/BillFragment.java	(revision 462ef3147c0b40ebb8b94f60be1c9b9d27683c8d)
++++ b/app/src/main/java/team1/fpoly/duan_n1_17303/Fragment/BillFragment.java	(date 1669908565590)
+@@ -8,17 +8,22 @@
+ 
+ import androidx.annotation.NonNull;
+ import androidx.annotation.Nullable;
++import androidx.appcompat.app.ActionBar;
+ import androidx.fragment.app.Fragment;
++import androidx.fragment.app.FragmentManager;
+ 
+ import com.google.android.material.floatingactionbutton.FloatingActionButton;
+ 
++import team1.fpoly.duan_n1_17303.MainActivity;
+ import team1.fpoly.duan_n1_17303.R;
++import team1.fpoly.duan_n1_17303.Tools.AddBillFragment;
+ 
+ 
+ public class BillFragment extends Fragment {
+ 
+     ListView lv_Bill;
+     FloatingActionButton fl_Add_Bill;
++    AddBillFragment addBillFragment;
+     @Override
+     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+         return inflater.inflate(R.layout.fragment_bill, container, false);
+@@ -27,8 +32,18 @@
+     @Override
+     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+         super.onViewCreated(view, savedInstanceState);
+-
++        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
++        addBillFragment = new AddBillFragment();
+         lv_Bill = view.findViewById(R.id.lv_Bill);
+         fl_Add_Bill = view.findViewById(R.id.fl_Add_Bill);
++        fl_Add_Bill.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                MainActivity mainActivity = (MainActivity) getActivity();
++                ActionBar actionBar = mainActivity.getSupportActionBar();
++                actionBar.hide();
++                fragmentManager.beginTransaction().replace(R.id.frameLayout, addBillFragment).commit();
++            }
++        });
+     }
+ }
+\ No newline at end of file
+Index: app/src/main/java/team1/fpoly/duan_n1_17303/Database/MyDatabase.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package team1.fpoly.duan_n1_17303.Database;\r\n\r\nimport android.content.Context;\r\nimport android.database.sqlite.SQLiteDatabase;\r\nimport android.database.sqlite.SQLiteOpenHelper;\r\n\r\npublic class MyDatabase extends SQLiteOpenHelper {\r\n    private static int VERSION = 1;\r\n    public MyDatabase(Context context){\r\n        super(context, \"HOTELMANAGER\", null, VERSION);\r\n    }\r\n\r\n    @Override\r\n    public void onCreate(SQLiteDatabase sqLiteDatabase) {\r\n        String tbStaff = \"create table STAFF\" +\r\n                \"(STAFF_ID INTEGER PRIMARY KEY AUTOINCREMENT, \" +\r\n                \"STAFF_USERNAME TEXT not null, \" +\r\n                \"STAFF_PASSWORD TEXT not null, \" +\r\n                \"DISPLAY_NAME TEXT NOT NULL, \" +\r\n                \"DATE_OF_BIRTH Date , \" +\r\n                \"SEX TEXT, \" +\r\n                \"PHONE TEXT)\";\r\n        sqLiteDatabase.execSQL(tbStaff);\r\n        String sql = \"INSERT INTO STAFF(STAFF_ID, STAFF_USERNAME, STAFF_PASSWORD, DISPLAY_NAME, DATE_OF_BIRTH, SEX, PHONE) VALUES \" +\r\n                \"('1','admin','123','ADMIN', null, null, null),\" +\r\n                \"('2','kienpcph23267','kien123','Phùng Chí Kiên','19/06/2003', 'Nam', '0979896589')\";\r\n        sqLiteDatabase.execSQL(sql);\r\n\r\n        String tbCustomer = \"create table CUSTOMER\" +\r\n                \"(CUSTOMER_ID INTEGER primary key AUTOINCREMENT, \" +\r\n                \"CUSTOMER_NAME TEXT not null, \" +\r\n                \"DATE_OF_BIRTH Date not null, \" +\r\n                \"PHONE TEXT  not null, \" +\r\n                \"SEX TEXT not null)\";\r\n        sqLiteDatabase.execSQL(tbCustomer);\r\n        //sql = \"INSERT INTO CUSTOMER(CUSTOMER_ID, CUSTOMER_NAME, DATE_OF_BIRTH, PHONE, SEX) VALUES \" +\r\n        //        \"('1','Phùng Chí Kiên','19/06/2003','0979896589','Nam'),\" +\r\n        //        \"('2','Lê Thu Thảo','14/08/2005','0979896589','Nữ')\";\r\n        //sqLiteDatabase.execSQL(sql);\r\n\r\n        String tbRoom = \"CREATE TABLE ROOM\" +\r\n                \"(ROOM_ID INTEGER PRIMARY KEY AUTOINCREMENT,\" +\r\n                \"ROOM_NAME TEXT NOT NULL,\" +\r\n                \"ROOM_LOCATION INT NOT NULL,\" +\r\n                \"ROOM_TYPE TEXT NOT NULL,\" +\r\n                \"ROOM_VIEW TEXT NOT NULL,\" +\r\n                \"DAY_PRICE INTEGER NOT NULL,\" +\r\n                \"HOUR_PRICE INTEGER NOT NULL,\" +\r\n                \"NOTE TEXT)\";\r\n        sqLiteDatabase.execSQL(tbRoom);\r\n\r\n\r\n        String tbProduct = \"CREATE TABLE PRODUCT\" +\r\n                \"(PRODUCT_ID INTEGER PRIMARY KEY AUTOINCREMENT,\" +\r\n                \"PRODUCT_NAME TEXT NOT NULL,\" +\r\n                \"PRICE INTEGER NOT NULL,\" +\r\n                \"QUANTITY INTEGER NOT NULL)\";\r\n        sqLiteDatabase.execSQL(tbProduct);\r\n        sql = \"INSERT INTO PRODUCT( PRODUCT_NAME, PRICE, QUANTITY) VALUES \" +\r\n                \"('test','1','1')\";\r\n        sqLiteDatabase.execSQL(sql);\r\n\r\n        String tbRoomProduct = \"CREATE TABLE ROOM_PRODUCT\" +\r\n                \"(PRODUCT_ID INTEGER REFERENCES PRODUCT(PRODUCT_ID),\" +\r\n                \"ROOM_ID INTEGER REFERENCES ROOM(ROOM_ID),\" +\r\n                \"PRODUCT_NAME TEXT NOT NULL,\" +\r\n                \"PRICE INTEGER NOT NULL,\" +\r\n                \"QUANTITY INTEGER NOT NULL)\";\r\n        sqLiteDatabase.execSQL(tbRoomProduct);\r\n\r\n        String tbBillProduct = \"CREATE TABLE BILL_PRODUCT\" +\r\n                \"(PRODUCT_ID INTEGER REFERENCES PRODUCT(PRODUCT_ID),\" +\r\n                \"BILL_ID INTEGER REFERENCES ROOM(BILL_ID),\" +\r\n                \"PRODUCT_NAME TEXT NOT NULL,\" +\r\n                \"PRICE INTEGER NOT NULL,\" +\r\n                \"QUANTITY INTEGER NOT NULL)\";\r\n        sqLiteDatabase.execSQL(tbBillProduct);\r\n\r\n        String tbBill = \"CREATE TABLE BILL\" +\r\n                \"(BILL_ID INTEGER PRIMARY KEY AUTOINCREMENT,\" +\r\n                \"STAFF_ID INTEGER REFERENCES STAFF(STAFF_ID),\" +\r\n                \"CUSTOMER_ID INTEGER REFERENCES CUSTOMER(CUSTOMER_ID),\" +\r\n                \"ROOM_ID INTEGER REFERENCES ROOM(ROOM_ID),\" +\r\n                \"DATE_CHECK_IN TEXT NOT NULL,\" +\r\n                \"DATE_CHECK_OUT TEXT NOT NULL,\" +\r\n                \"NOTE TEXT)\";\r\n        sqLiteDatabase.execSQL(tbBill);\r\n    }\r\n\r\n    @Override\r\n    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {\r\n        if(i != i1){\r\n            sqLiteDatabase.execSQL(\"DROP TABLE IF EXISTS STAFF\");\r\n            sqLiteDatabase.execSQL(\"DROP TABLE IF EXISTS CUSTOMER\");\r\n            sqLiteDatabase.execSQL(\"DROP TABLE IF EXISTS ROOM\");\r\n            sqLiteDatabase.execSQL(\"DROP TABLE IF EXISTS ROOM_PRODUCT\");\r\n            sqLiteDatabase.execSQL(\"DROP TABLE IF EXISTS BILL_PRODUCT\");\r\n            sqLiteDatabase.execSQL(\"DROP TABLE IF EXISTS PRODUCT\");\r\n            sqLiteDatabase.execSQL(\"DROP TABLE IF EXISTS BILL\");\r\n            onCreate(sqLiteDatabase);\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/team1/fpoly/duan_n1_17303/Database/MyDatabase.java b/app/src/main/java/team1/fpoly/duan_n1_17303/Database/MyDatabase.java
+--- a/app/src/main/java/team1/fpoly/duan_n1_17303/Database/MyDatabase.java	(revision 462ef3147c0b40ebb8b94f60be1c9b9d27683c8d)
++++ b/app/src/main/java/team1/fpoly/duan_n1_17303/Database/MyDatabase.java	(date 1669903844298)
+@@ -82,7 +82,9 @@
+                 "CUSTOMER_ID INTEGER REFERENCES CUSTOMER(CUSTOMER_ID)," +
+                 "ROOM_ID INTEGER REFERENCES ROOM(ROOM_ID)," +
+                 "DATE_CHECK_IN TEXT NOT NULL," +
++                "TIME_CHECK_IN TEXT NOT NULL," +
+                 "DATE_CHECK_OUT TEXT NOT NULL," +
++                "TIME_CHECK_OUT TEXT NOT NULL," +
+                 "NOTE TEXT)";
+         sqLiteDatabase.execSQL(tbBill);
+     }
+Index: app/src/main/res/layout/fragment_add_bill.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    android:orientation=\"vertical\"\r\n    tools:context=\".Tools.AddBillFragment\">\r\n\r\n    <androidx.appcompat.widget.Toolbar\r\n        android:id=\"@+id/fragmentAddBill_Toolbar\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:background=\"#b2ffba \"\r\n        android:fitsSystemWindows=\"true\"\r\n        android:minHeight=\"?attr/actionBarSize\"\r\n        android:theme=\"@style/ThemeOverlay.AppCompat.Dark.ActionBar\">\r\n\r\n        <ImageView\r\n            android:id=\"@+id/img_Back_Bill\"\r\n            android:layout_width=\"30dp\"\r\n            android:layout_height=\"30dp\"\r\n            android:layout_gravity=\"left\"\r\n            android:src=\"@drawable/ic_back\" />\r\n\r\n        <TextView\r\n            android:id=\"@+id/tv_Title_Bill\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_gravity=\"center\"\r\n            android:text=\"Hóa đơn\"\r\n            android:textColor=\"#000000\"\r\n            android:textSize=\"25dp\"\r\n            android:textStyle=\"bold\" />\r\n\r\n        <ImageView\r\n            android:id=\"@+id/img_Save_Bill\"\r\n            android:layout_width=\"30dp\"\r\n            android:layout_height=\"30dp\"\r\n            android:layout_gravity=\"right\"\r\n            android:layout_marginRight=\"10dp\"\r\n            android:src=\"@drawable/ic_save\" />\r\n    </androidx.appcompat.widget.Toolbar>\r\n\r\n    <LinearLayout\r\n        android:layout_margin=\"10dp\"\r\n        android:layout_width=\"300dp\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:gravity=\"center_vertical\"\r\n        android:orientation=\"horizontal\">\r\n\r\n        <TextView\r\n            android:layout_width=\"110dp\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_margin=\"10dp\"\r\n            android:gravity=\"center\"\r\n            android:hint=\"Khách hàng\"\r\n            android:textSize=\"20sp\" />\r\n\r\n        <Spinner\r\n            android:id=\"@+id/spinner_Bill_Customer\"\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"wrap_content\" />\r\n    </LinearLayout>\r\n\r\n    <LinearLayout\r\n        android:layout_margin=\"10dp\"\r\n        android:layout_width=\"300dp\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:gravity=\"center_vertical\"\r\n        android:orientation=\"horizontal\">\r\n\r\n        <TextView\r\n            android:layout_width=\"110dp\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_margin=\"10dp\"\r\n            android:gravity=\"center\"\r\n            android:hint=\"Phòng\"\r\n            android:textSize=\"20sp\" />\r\n\r\n        <Spinner\r\n            android:id=\"@+id/spinner_Bill_Room\"\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"wrap_content\" />\r\n    </LinearLayout>\r\n\r\n\r\n    <LinearLayout\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_margin=\"10dp\"\r\n        android:gravity=\"center_vertical\"\r\n        android:orientation=\"horizontal\">\r\n\r\n        <EditText\r\n            android:id=\"@+id/fragmentAddBill_EditText_DateCheckIn\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_weight=\"1\"\r\n            android:gravity=\"center\"\r\n            android:hint=\"Ngày vào\"\r\n            android:inputType=\"none\" />\r\n\r\n        <ImageView\r\n            android:id=\"@+id/fragmentAddBill_ImageView_DateCheckIn_DatePicker\"\r\n            android:layout_width=\"50dp\"\r\n            android:layout_height=\"50dp\"\r\n            android:src=\"@drawable/ic_calendar\" />\r\n    </LinearLayout>\r\n\r\n    <LinearLayout\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_margin=\"10dp\"\r\n        android:gravity=\"center_vertical\"\r\n        android:orientation=\"horizontal\">\r\n\r\n        <EditText\r\n            android:id=\"@+id/fragmentAddBill_EditText_DateCheckOut\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_weight=\"1\"\r\n            android:gravity=\"center\"\r\n            android:hint=\"Ngày ra\"\r\n            android:inputType=\"none\" />\r\n\r\n        <ImageView\r\n            android:id=\"@+id/fragmentAddBill_ImageView_DateCheckOut_DatePicker\"\r\n            android:layout_width=\"50dp\"\r\n            android:layout_height=\"50dp\"\r\n            android:src=\"@drawable/ic_calendar\" />\r\n    </LinearLayout>\r\n</LinearLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/fragment_add_bill.xml b/app/src/main/res/layout/fragment_add_bill.xml
+--- a/app/src/main/res/layout/fragment_add_bill.xml	(revision 462ef3147c0b40ebb8b94f60be1c9b9d27683c8d)
++++ b/app/src/main/res/layout/fragment_add_bill.xml	(date 1669906309086)
+@@ -102,11 +102,34 @@
+             android:inputType="none" />
+ 
+         <ImageView
+-            android:id="@+id/fragmentAddBill_ImageView_DateCheckIn_DatePicker"
++            android:id="@+id/fragmentAddBill_ImageView_DateCheckIn_Picker"
+             android:layout_width="50dp"
+             android:layout_height="50dp"
+             android:src="@drawable/ic_calendar" />
+     </LinearLayout>
++    <LinearLayout
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:layout_margin="10dp"
++        android:gravity="center_vertical"
++        android:orientation="horizontal">
++
++        <EditText
++            android:id="@+id/fragmentAddBill_EditText_HourCheckIn"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_weight="1"
++            android:gravity="center"
++            android:hint="Giờ vào"
++            android:inputType="none" />
++
++        <ImageView
++            android:id="@+id/fragmentAddBill_ImageView_HourCheckIn_Picker"
++            android:layout_width="50dp"
++            android:layout_height="50dp"
++            android:src="@drawable/ic_clock" />
++    </LinearLayout>
++
+ 
+     <LinearLayout
+         android:layout_width="match_parent"
+@@ -125,9 +148,33 @@
+             android:inputType="none" />
+ 
+         <ImageView
+-            android:id="@+id/fragmentAddBill_ImageView_DateCheckOut_DatePicker"
++            android:id="@+id/fragmentAddBill_ImageView_DateCheckOut_Picker"
+             android:layout_width="50dp"
+             android:layout_height="50dp"
+             android:src="@drawable/ic_calendar" />
++
++    </LinearLayout>
++    <LinearLayout
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:layout_margin="10dp"
++        android:gravity="center_vertical"
++        android:orientation="horizontal">
++
++        <EditText
++            android:id="@+id/fragmentAddBill_EditText_HourCheckOut"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_weight="1"
++            android:gravity="center"
++            android:hint="Giờ ra"
++            android:inputType="none" />
++
++        <ImageView
++            android:id="@+id/fragmentAddBill_ImageView_HourCheckOut_Picker"
++            android:layout_width="50dp"
++            android:layout_height="50dp"
++            android:src="@drawable/ic_clock" />
+     </LinearLayout>
++
+ </LinearLayout>
+\ No newline at end of file
+Index: app/src/main/java/team1/fpoly/duan_n1_17303/Tools/AddCustomerFragment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package team1.fpoly.duan_n1_17303.Tools;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.app.Dialog;\r\nimport android.os.Bundle;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.annotation.Nullable;\r\nimport androidx.appcompat.app.ActionBar;\r\nimport androidx.appcompat.widget.Toolbar;\r\nimport androidx.fragment.app.Fragment;\r\nimport androidx.fragment.app.FragmentManager;\r\n\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.Button;\r\nimport android.widget.DatePicker;\r\nimport android.widget.EditText;\r\nimport android.widget.ImageView;\r\nimport android.widget.RadioButton;\r\nimport android.widget.Toast;\r\n\r\nimport java.util.ArrayList;\r\n\r\nimport team1.fpoly.duan_n1_17303.Dao.CustomerDao;\r\nimport team1.fpoly.duan_n1_17303.Fragment.CustomerFragment;\r\nimport team1.fpoly.duan_n1_17303.MainActivity;\r\nimport team1.fpoly.duan_n1_17303.Object.Customer;\r\nimport team1.fpoly.duan_n1_17303.R;\r\n\r\npublic class AddCustomerFragment extends Fragment {\r\n    RadioButton add_Customer_radio_btn_nam,add_Customer_radio_btn_nu;\r\n    FragmentManager fm;\r\n    CustomerFragment customerFragment;\r\n    ImageView img_Back_Customer, img_Save_Customer;\r\n    EditText ed_Customer_Name, ed_Customer_Date, ed_Customer_Phone;\r\n    ArrayList<Customer> listCustomer;\r\n    CustomerDao customerDao;\r\n    String Customer_gender =\"\";\r\n    ImageView iv_date_pick;\r\n    @Override\r\n    public View onCreateView(LayoutInflater inflater, ViewGroup container,\r\n                             Bundle savedInstanceState) {\r\n        return inflater.inflate(R.layout.fragment_add_customer, container, false);\r\n    }\r\n\r\n    @SuppressLint(\"RestrictedApi\")\r\n    @Override\r\n    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {\r\n        super.onViewCreated(view, savedInstanceState);\r\n\r\n        iv_date_pick = view.findViewById(R.id.fragmentCustomer_ImageView_DatePicker);\r\n        add_Customer_radio_btn_nam = view.findViewById(R.id.fragmentCustomer_RadioButon_Nam);\r\n        add_Customer_radio_btn_nu = view.findViewById(R.id.fragmentCustomer_RadioButon_Nu);\r\n        ed_Customer_Name = view.findViewById(R.id.fragmentCustomer_EditText_Customer_Name);\r\n        ed_Customer_Date = view.findViewById(R.id.fragmentCustomer_EditText_Customer_DOB);\r\n        ed_Customer_Phone = view.findViewById(R.id.fragmentCustomer_EditText_Customer_Phone);\r\n        img_Back_Customer = view.findViewById(R.id.img_Back_Customer);\r\n        img_Save_Customer = view.findViewById(R.id.img_Save_Customer);\r\n        ed_Customer_Date.setEnabled(false);\r\n        fm = getActivity().getSupportFragmentManager();\r\n        customerFragment = new CustomerFragment();\r\n        add_Customer_radio_btn_nam.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                setGender(v);\r\n            }\r\n        });\r\n        add_Customer_radio_btn_nu.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                setGender(v);\r\n            }\r\n        });\r\n        img_Back_Customer.setOnClickListener(v -> {\r\n            MainActivity mainActivity = (MainActivity) getActivity();\r\n            ActionBar actionBar = mainActivity.getSupportActionBar();\r\n            actionBar.show();\r\n            fm.beginTransaction().replace(R.id.frameLayout, customerFragment).commit();\r\n        });\r\n        img_Save_Customer.setOnClickListener(v -> {\r\n            saveDataCustomer();\r\n        });\r\n\r\n        iv_date_pick.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                Dialog dialog = new Dialog(getActivity());\r\n                dialog.setContentView(R.layout.dialog_date_picker);\r\n                DatePicker datePicker = (DatePicker) dialog.findViewById(R.id.dialog_date_picker_DatePicker);\r\n                Button btnSubmit = dialog.findViewById(R.id.dialog_date_picker_buttonSubmit);\r\n                btnSubmit.setOnClickListener(new View.OnClickListener() {\r\n                    @Override\r\n                    public void onClick(View v) {\r\n                        String\tday\t=String.valueOf(datePicker.getDayOfMonth());\r\n                        String\tmonth =String.valueOf(datePicker.getMonth());\r\n                        String\tyear =String.valueOf(datePicker.getYear());\r\n                        String date_picked = day +\"/\" + month +\"/\" + year;\r\n                        ed_Customer_Date.setText(date_picked);\r\n                        dialog.dismiss();\r\n                    }\r\n                });\r\n                dialog.show();\r\n            }\r\n        });\r\n    }\r\n\r\n    public void saveDataCustomer() {\r\n        listCustomer = new ArrayList<>();\r\n        customerDao = new CustomerDao(getActivity());\r\n        Customer c = new Customer();\r\n        String id = null;\r\n        String name = ed_Customer_Name.getText().toString();\r\n        String date = ed_Customer_Date.getText().toString();\r\n        String phone = ed_Customer_Phone.getText().toString();\r\n        String sex =Customer_gender;\r\n\r\n        if (name.isEmpty() || date.isEmpty() || phone.isEmpty() || sex.isEmpty()) {\r\n            Toast.makeText(getActivity(), \"Bạn phải nhập đầy đủ thông tin\", Toast.LENGTH_SHORT).show();\r\n            return;\r\n        }\r\n\r\n        c.setCustomerName(name);\r\n        c.setDayOfBirth(date);\r\n        c.setPhone(phone);\r\n        c.setSex(sex);\r\n        if (customerDao.insertCustomer(c) > 0) {\r\n            Toast.makeText(getActivity(), \"Thêm khách hàng thành công\", Toast.LENGTH_SHORT).show();\r\n        } else {\r\n            Toast.makeText(getActivity(), \"Thêm khách hàng thất bại\", Toast.LENGTH_SHORT).show();\r\n        }\r\n        MainActivity mainActivity = (MainActivity) getActivity();\r\n        ActionBar actionBar = mainActivity.getSupportActionBar();\r\n        actionBar.show();\r\n        fm.beginTransaction().replace(R.id.frameLayout, customerFragment).commit();\r\n\r\n\r\n    }\r\n    public void setGender(View view){\r\n        boolean checked = ((RadioButton) view).isChecked();\r\n        switch(view.getId()) {\r\n            case R.id.fragmentCustomer_RadioButon_Nam:\r\n                if (checked)\r\n                    Customer_gender=\"Nam\";\r\n                    break;\r\n            case R.id.fragmentCustomer_RadioButon_Nu:\r\n                if (checked)\r\n                    Customer_gender=\"Nữ\";\r\n                    break;\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/team1/fpoly/duan_n1_17303/Tools/AddCustomerFragment.java b/app/src/main/java/team1/fpoly/duan_n1_17303/Tools/AddCustomerFragment.java
+--- a/app/src/main/java/team1/fpoly/duan_n1_17303/Tools/AddCustomerFragment.java	(revision 462ef3147c0b40ebb8b94f60be1c9b9d27683c8d)
++++ b/app/src/main/java/team1/fpoly/duan_n1_17303/Tools/AddCustomerFragment.java	(date 1669916227773)
+@@ -107,7 +107,7 @@
+     }
+ 
+     public void saveDataCustomer() {
+-        listCustomer = new ArrayList<>();
++
+         customerDao = new CustomerDao(getActivity());
+         Customer c = new Customer();
+         String id = null;
+Index: app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/BillAdapter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/BillAdapter.java b/app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/BillAdapter.java
+new file mode 100644
+--- /dev/null	(date 1669919649313)
++++ b/app/src/main/java/team1/fpoly/duan_n1_17303/Adapter/BillAdapter.java	(date 1669919649313)
+@@ -0,0 +1,32 @@
++package team1.fpoly.duan_n1_17303.Adapter;
++
++import android.content.Context;
++import android.widget.ArrayAdapter;
++
++import androidx.annotation.NonNull;
++
++import java.util.ArrayList;
++
++import team1.fpoly.duan_n1_17303.Dao.BillDao;
++import team1.fpoly.duan_n1_17303.Object.Bill;
++
++public class BillAdapter extends ArrayAdapter<Bill> {
++    Context context;
++    ArrayList<Bill> listBill;
++    BillDao billDao;
++
++    public BillAdapter(Context context,ArrayList<Bill> listBill,BillDao billDao){
++        super(context,0,listBill);
++        this.context=context;
++        this.listBill=listBill;
++        this.billDao=billDao;
++    }
++    @Override
++    public int getCount() {
++        if (!listBill.isEmpty()) return listBill.size();
++        return 0;
++    }
++
++
++
++}
+Index: app/src/main/java/team1/fpoly/duan_n1_17303/Dao/BillDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/BillDao.java b/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/BillDao.java
+new file mode 100644
+--- /dev/null	(date 1669917731935)
++++ b/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/BillDao.java	(date 1669917731935)
+@@ -0,0 +1,84 @@
++package team1.fpoly.duan_n1_17303.Dao;
++
++import android.content.ContentValues;
++import android.content.Context;
++import android.database.Cursor;
++import android.database.sqlite.SQLiteDatabase;
++
++import java.util.ArrayList;
++
++import team1.fpoly.duan_n1_17303.Database.MyDatabase;
++import team1.fpoly.duan_n1_17303.Object.Bill;
++
++public class BillDao {
++    SQLiteDatabase db;
++    MyDatabase myDatabase;
++    public BillDao(Context context){
++        myDatabase = new MyDatabase(context);
++        db = myDatabase.getWritableDatabase();
++    }
++
++
++    public ArrayList<Bill> getListBill(){
++        ArrayList<Bill> listBill = new ArrayList<>();
++        SQLiteDatabase sqLiteDatabase = myDatabase.getReadableDatabase();
++        String sql = "SELECT * FROM BILL";
++        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
++        if(cursor.getCount() !=0){
++            cursor.moveToFirst();
++            do {
++                listBill.add(new Bill(cursor.getInt(0), cursor.getInt(1), cursor.getInt(2), cursor.getInt(3),cursor.getString(4),cursor.getString(5),cursor.getString(6),cursor.getString(7),cursor.getString(8)));
++            }while (cursor.moveToNext());
++        }
++        return listBill;
++    }
++
++
++    public boolean insertBill(Bill bill){
++        SQLiteDatabase sqLiteDatabase = myDatabase.getWritableDatabase();
++        ContentValues values = new ContentValues();
++        values.put("STAFF_ID", bill.getStaffId());
++        values.put("CUSTOMER_ID",bill.getCustomerId() );
++        values.put("ROOM_ID", bill.getRoomId());
++        values.put("DATE_CHECK_IN", bill.getDateCheckIn());
++        values.put("TIME_CHECK_IN", bill.getTimeCheckIn());
++        values.put("DATE_CHECK_OUT", bill.getTimeCheckOut());
++        values.put("TIME_CHECK_OUT", bill.getTimeCheckOut());
++        values.put("NOTE", bill.getNote());
++        long check = sqLiteDatabase.insert("BILL", null, values);
++        if(check == -1)
++            return false;
++        return true;
++    }
++
++    //sửa dl
++    public boolean updateBill(Bill bill){
++        SQLiteDatabase sqLiteDatabase = myDatabase.getWritableDatabase();
++        ContentValues values = new ContentValues();
++        values.put("STAFF_ID", bill.getStaffId());
++        values.put("CUSTOMER_ID",bill.getCustomerId() );
++        values.put("ROOM_ID", bill.getRoomId());
++        values.put("DATE_CHECK_IN", bill.getDateCheckIn());
++        values.put("TIME_CHECK_IN", bill.getTimeCheckIn());
++        values.put("DATE_CHECK_OUT", bill.getTimeCheckOut());
++        values.put("TIME_CHECK_OUT", bill.getTimeCheckOut());
++        values.put("NOTE", bill.getNote());
++        long check = sqLiteDatabase.update("BILL",values,"BILL_ID = ?",
++                new String[]{String.valueOf(bill.getBillId())});
++        if(check==-1)
++            return false;
++        return true;
++    }
++    public int deleteRoom(int id){
++        Cursor cursor = db.rawQuery("SELECT * FROM BILL_PRODUCT WHERE BILL_ID = ?", new String[]{String.valueOf(id)});
++        if(cursor.getCount()!=0){
++            return -1;
++        }
++        cursor.close();
++
++        long check = db.delete("BILL", "BILL_ID = ?", new String[]{String.valueOf(id)});
++        if(check == -1)
++            return 0;
++        return 1;
++    }
++}
+Index: app/src/main/res/layout/dialog_time_picker.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/dialog_time_picker.xml b/app/src/main/res/layout/dialog_time_picker.xml
+new file mode 100644
+--- /dev/null	(date 1669914105286)
++++ b/app/src/main/res/layout/dialog_time_picker.xml	(date 1669914105286)
+@@ -0,0 +1,26 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:tools="http://schemas.android.com/tools"
++    android:layout_width="match_parent"
++    android:layout_height="wrap_content"
++    tools:context=".MainActivity"
++    android:orientation="vertical"
++    android:gravity="center_horizontal">
++
++    <TimePicker
++        android:id="@+id/dialog_time_picker_TimePicker"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:timePickerMode="spinner"
++
++        android:calendarViewShown="false"/>
++
++    <Button
++        android:id="@+id/dialog_time_picker_buttonSubmit"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:layout_margin="20dp"
++        android:background="#150"
++        android:text="Lưu"
++        android:textSize="20sp" />
++</LinearLayout>
+\ No newline at end of file
+Index: app/src/main/res/drawable/ic_clock.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/drawable/ic_clock.xml b/app/src/main/res/drawable/ic_clock.xml
+new file mode 100644
+--- /dev/null	(date 1669906131584)
++++ b/app/src/main/res/drawable/ic_clock.xml	(date 1669906131584)
+@@ -0,0 +1,7 @@
++<vector android:height="24dp" android:tint="#80CB8A"
++    android:viewportHeight="24" android:viewportWidth="24"
++    android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
++    <path android:fillColor="@android:color/white" android:pathData="M10,8l0,6l4.7,2.9l0.8,-1.2l-4,-2.4l0,-5.3z"/>
++    <path android:fillColor="@android:color/white" android:pathData="M17.92,12c0.05,0.33 0.08,0.66 0.08,1c0,3.9 -3.1,7 -7,7s-7,-3.1 -7,-7c0,-3.9 3.1,-7 7,-7c0.7,0 1.37,0.1 2,0.29V4.23C12.36,4.08 11.69,4 11,4c-5,0 -9,4 -9,9s4,9 9,9s9,-4 9,-9c0,-0.34 -0.02,-0.67 -0.06,-1H17.92z"/>
++    <path android:fillColor="@android:color/white" android:pathData="M20,5l0,-3l-2,0l0,3l-3,0l0,2l3,0l0,3l2,0l0,-3l3,0l0,-2z"/>
++</vector>
+Index: app/src/main/java/team1/fpoly/duan_n1_17303/Object/Bill.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package team1.fpoly.duan_n1_17303.Object;\r\n\r\nimport java.sql.Date;\r\n\r\npublic class Bill {\r\n    private int billId;\r\n    private int staffId;\r\n    private int customerId;\r\n    private int roomId;\r\n    private int productId;\r\n    private Date dateCheckIn;\r\n    private Date dateCheckOut;\r\n    private String note;\r\n\r\n    public Bill() {\r\n    }\r\n\r\n    public Bill(int billId, int staffId, int customerId, int roomId, int productId, Date dateCheckIn, Date dateCheckOut, String note) {\r\n        this.billId = billId;\r\n        this.staffId = staffId;\r\n        this.customerId = customerId;\r\n        this.roomId = roomId;\r\n        this.productId = productId;\r\n        this.dateCheckIn = dateCheckIn;\r\n        this.dateCheckOut = dateCheckOut;\r\n        this.note = note;\r\n    }\r\n\r\n    public int getBillId() {\r\n        return billId;\r\n    }\r\n\r\n    public void setBillId(int billId) {\r\n        this.billId = billId;\r\n    }\r\n\r\n    public int getStaffId() {\r\n        return staffId;\r\n    }\r\n\r\n    public void setStaffId(int staffId) {\r\n        this.staffId = staffId;\r\n    }\r\n\r\n    public int getCustomerId() {\r\n        return customerId;\r\n    }\r\n\r\n    public void setCustomerId(int customerId) {\r\n        this.customerId = customerId;\r\n    }\r\n\r\n    public int getRoomId() {\r\n        return roomId;\r\n    }\r\n\r\n    public void setRoomId(int roomId) {\r\n        this.roomId = roomId;\r\n    }\r\n\r\n    public int getProductId() {\r\n        return productId;\r\n    }\r\n\r\n    public void setProductId(int productId) {\r\n        this.productId = productId;\r\n    }\r\n\r\n    public Date getDateCheckIn() {\r\n        return dateCheckIn;\r\n    }\r\n\r\n    public void setDateCheckIn(Date dateCheckIn) {\r\n        this.dateCheckIn = dateCheckIn;\r\n    }\r\n\r\n    public Date getDateCheckOut() {\r\n        return dateCheckOut;\r\n    }\r\n\r\n    public void setDateCheckOut(Date dateCheckOut) {\r\n        this.dateCheckOut = dateCheckOut;\r\n    }\r\n\r\n    public String getNote() {\r\n        return note;\r\n    }\r\n\r\n    public void setNote(String note) {\r\n        this.note = note;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/team1/fpoly/duan_n1_17303/Object/Bill.java b/app/src/main/java/team1/fpoly/duan_n1_17303/Object/Bill.java
+--- a/app/src/main/java/team1/fpoly/duan_n1_17303/Object/Bill.java	(revision 462ef3147c0b40ebb8b94f60be1c9b9d27683c8d)
++++ b/app/src/main/java/team1/fpoly/duan_n1_17303/Object/Bill.java	(date 1669905409123)
+@@ -7,22 +7,24 @@
+     private int staffId;
+     private int customerId;
+     private int roomId;
+-    private int productId;
+-    private Date dateCheckIn;
+-    private Date dateCheckOut;
++    private String dateCheckIn;
++    private String timeCheckIn;
++    private String dateCheckOut;
++    private String timeCheckOut;
+     private String note;
+ 
+     public Bill() {
+     }
+ 
+-    public Bill(int billId, int staffId, int customerId, int roomId, int productId, Date dateCheckIn, Date dateCheckOut, String note) {
++    public Bill(int billId, int staffId, int customerId, int roomId, String dateCheckIn, String timeCheckIn, String dateCheckOut, String timeCheckOut, String note) {
+         this.billId = billId;
+         this.staffId = staffId;
+         this.customerId = customerId;
+         this.roomId = roomId;
+-        this.productId = productId;
+         this.dateCheckIn = dateCheckIn;
++        this.timeCheckIn = timeCheckIn;
+         this.dateCheckOut = dateCheckOut;
++        this.timeCheckOut = timeCheckOut;
+         this.note = note;
+     }
+ 
+@@ -58,30 +60,38 @@
+         this.roomId = roomId;
+     }
+ 
+-    public int getProductId() {
+-        return productId;
+-    }
+-
+-    public void setProductId(int productId) {
+-        this.productId = productId;
+-    }
+-
+-    public Date getDateCheckIn() {
++    public String getDateCheckIn() {
+         return dateCheckIn;
+     }
+ 
+-    public void setDateCheckIn(Date dateCheckIn) {
++    public void setDateCheckIn(String dateCheckIn) {
+         this.dateCheckIn = dateCheckIn;
+     }
+ 
+-    public Date getDateCheckOut() {
++    public String getTimeCheckIn() {
++        return timeCheckIn;
++    }
++
++    public void setTimeCheckIn(String timeCheckIn) {
++        this.timeCheckIn = timeCheckIn;
++    }
++
++    public String getDateCheckOut() {
+         return dateCheckOut;
+     }
+ 
+-    public void setDateCheckOut(Date dateCheckOut) {
++    public void setDateCheckOut(String dateCheckOut) {
+         this.dateCheckOut = dateCheckOut;
+     }
+ 
++    public String getTimeCheckOut() {
++        return timeCheckOut;
++    }
++
++    public void setTimeCheckOut(String timeCheckOut) {
++        this.timeCheckOut = timeCheckOut;
++    }
++
+     public String getNote() {
+         return note;
+     }
+Index: app/src/main/java/team1/fpoly/duan_n1_17303/LoginActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package team1.fpoly.duan_n1_17303;\r\n\r\nimport android.content.Context;\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.text.InputType;\r\nimport android.view.View;\r\nimport android.widget.Button;\r\nimport android.widget.EditText;\r\nimport android.widget.ImageView;\r\nimport android.widget.ListView;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.appcompat.app.AppCompatActivity;\r\n\r\nimport com.google.android.material.floatingactionbutton.FloatingActionButton;\r\n\r\nimport java.util.ArrayList;\r\n\r\nimport team1.fpoly.duan_n1_17303.Adapter.StaffAdapter;\r\nimport team1.fpoly.duan_n1_17303.Dao.StaffDao;\r\nimport team1.fpoly.duan_n1_17303.Object.Customer;\r\nimport team1.fpoly.duan_n1_17303.Object.Staff;\r\nimport team1.fpoly.duan_n1_17303.Tools.AddStaffFragment;\r\n\r\npublic class LoginActivity extends AppCompatActivity {\r\n    EditText edUserName, edPassword;\r\n    TextView tvForgerPass;\r\n    ListView lv_Staff;\r\n    ArrayList<Staff> listStaff;\r\n    AddStaffFragment addStaffFragment;\r\n    String strUser, strPass;\r\n    team1.fpoly.duan_n1_17303.Dao.StaffDao staffDao;\r\n    ImageView ivCheck;\r\n    Button btnLogin;\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_login);\r\n        final int[] isShow = {0};\r\n        staffDao = new StaffDao(this);\r\n        edUserName = findViewById(R.id.edUserName);\r\n        edPassword = findViewById(R.id.edPassword);\r\n        tvForgerPass = findViewById(R.id.tvForgerPass);\r\n        btnLogin=findViewById(R.id.btn_login);\r\n        ivCheck= findViewById(R.id.ivPeek);\r\n        loadDataStaff(this);\r\n        ivCheck.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                if (isShow[0]!=0){\r\n                    edPassword.setHint(\"\");\r\n                    edPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);\r\n                    isShow[0]=0;\r\n                    ivCheck.setImageResource(R.drawable.ic_eye_close);\r\n                    }\r\n                else {edPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);\r\n                    ivCheck.setImageResource(R.drawable.ic_eye_open);\r\n                    edPassword.setHint(\"Enter password\");\r\n                    isShow[0]=1;}\r\n            }\r\n\r\n        });\r\n        btnLogin.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                strUser=edUserName.getText().toString();\r\n                strPass=edPassword.getText().toString();\r\n                if(strUser.isEmpty()||strPass.isEmpty()){\r\n                    Toast.makeText(LoginActivity.this, \"Vui lòng nhập đủ dữ liệu\", Toast.LENGTH_SHORT).show();\r\n                }else{\r\n                    if (checkAcc(strUser,strPass)==0){\r\n                        Toast.makeText(LoginActivity.this, \"Bạn đăng nhập với quyền quản lý\", Toast.LENGTH_SHORT).show();\r\n                        Intent intent = new Intent(getApplicationContext(),MainActivity.class);\r\n                        intent.putExtra(\"user\", strUser);\r\n                        intent.putExtra(\"pass\", strPass);\r\n\r\n                        startActivity(intent);\r\n                    }\r\n                    if (checkAcc(strUser,strPass)==1){\r\n                        Toast.makeText(LoginActivity.this, \"Bạn đăng nhập với quyền nhân viên\", Toast.LENGTH_SHORT).show();\r\n                        Intent intent = new Intent(getApplicationContext(),MainActivity.class);\r\n                        intent.putExtra(\"user\", strUser);\r\n                        intent.putExtra(\"pass\", strPass);\r\n                        startActivity(intent);\r\n                    }\r\n                    if (checkAcc(strUser,strPass)==2){\r\n                        Toast.makeText(LoginActivity.this, \"Tài khoản đăng nhập không tồn tại\", Toast.LENGTH_SHORT).show();\r\n                    }\r\n                }\r\n            }\r\n\r\n        });\r\n    }\r\n    public int checkAcc(String Acc,String Pass){\r\n        for(Staff x:listStaff){\r\n            if (x.getStaffUsername().equalsIgnoreCase(\"ADMIN\")){\r\n                if (Acc.equalsIgnoreCase(x.getStaffUsername())&&(Pass.equalsIgnoreCase(x.getStaffPassword()))){\r\n                    return 0;\r\n                }\r\n            }else{\r\n                if (Acc.equalsIgnoreCase(x.getStaffUsername())&&(Pass.equalsIgnoreCase(x.getStaffPassword())))\r\n                    return 1;\r\n            }\r\n        }\r\n        return 2;\r\n    }\r\n    public void loadDataStaff(Context context){\r\n        listStaff = staffDao.getDataStaff();\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/team1/fpoly/duan_n1_17303/LoginActivity.java b/app/src/main/java/team1/fpoly/duan_n1_17303/LoginActivity.java
+--- a/app/src/main/java/team1/fpoly/duan_n1_17303/LoginActivity.java	(revision 462ef3147c0b40ebb8b94f60be1c9b9d27683c8d)
++++ b/app/src/main/java/team1/fpoly/duan_n1_17303/LoginActivity.java	(date 1669907054884)
+@@ -27,13 +27,12 @@
+ public class LoginActivity extends AppCompatActivity {
+     EditText edUserName, edPassword;
+     TextView tvForgerPass;
+-    ListView lv_Staff;
+     ArrayList<Staff> listStaff;
+-    AddStaffFragment addStaffFragment;
+     String strUser, strPass;
+     team1.fpoly.duan_n1_17303.Dao.StaffDao staffDao;
+     ImageView ivCheck;
+     Button btnLogin;
++    int maNV;
+ 
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
+@@ -76,6 +75,7 @@
+                         Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                         intent.putExtra("user", strUser);
+                         intent.putExtra("pass", strPass);
++                        intent.putExtra("id", maNV);
+ 
+                         startActivity(intent);
+                     }
+@@ -84,6 +84,7 @@
+                         Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                         intent.putExtra("user", strUser);
+                         intent.putExtra("pass", strPass);
++                        intent.putExtra("id", maNV);
+                         startActivity(intent);
+                     }
+                     if (checkAcc(strUser,strPass)==2){
+@@ -98,10 +99,12 @@
+         for(Staff x:listStaff){
+             if (x.getStaffUsername().equalsIgnoreCase("ADMIN")){
+                 if (Acc.equalsIgnoreCase(x.getStaffUsername())&&(Pass.equalsIgnoreCase(x.getStaffPassword()))){
++                    maNV=x.getStaffId();
+                     return 0;
+                 }
+             }else{
+                 if (Acc.equalsIgnoreCase(x.getStaffUsername())&&(Pass.equalsIgnoreCase(x.getStaffPassword())))
++                    maNV=x.getStaffId();
+                     return 1;
+             }
+         }
+Index: app/src/main/res/layout/item_bill.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    android:orientation=\"vertical\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    android:padding=\"10dp\">\r\n\r\n    <androidx.cardview.widget.CardView\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        app:cardCornerRadius=\"20dp\"\r\n        app:cardElevation=\"10dp\"\r\n        android:layout_margin=\"10dp\">\r\n\r\n        <LinearLayout\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:background=\"#b2ffba\"\r\n            android:orientation=\"vertical\"\r\n            android:padding=\"10dp\">\r\n\r\n            <TextView\r\n                android:id=\"@+id/tv_Bill_Id\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:layout_marginTop=\"5dp\"\r\n                android:text=\"Mã hóa đơn: \"\r\n                android:textSize=\"14dp\" />\r\n\r\n            <TextView\r\n                android:id=\"@+id/tv_Staff\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"Nhân viên thêm hóa đơn:\"\r\n                android:textSize=\"14dp\" />\r\n\r\n            <TextView\r\n                android:id=\"@+id/tv_Customer\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:layout_marginTop=\"5dp\"\r\n                android:layout_marginBottom=\"5dp\"\r\n                android:text=\"Tên khách hàng:\"\r\n                android:textColor=\"#000000\"\r\n                android:textSize=\"24dp\"\r\n                android:textStyle=\"bold\" />\r\n\r\n            <TextView\r\n                android:id=\"@+id/tv_Room\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"Tên phòng: \"\r\n                android:textSize=\"16dp\" />\r\n\r\n            <TextView\r\n                android:id=\"@+id/tv_Date_Check_In\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"Ngày đến: \"\r\n                android:textSize=\"16dp\" />\r\n\r\n            <TextView\r\n                android:id=\"@+id/tv_Date_Check_Out\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"Ngày đi: \"\r\n                android:textSize=\"16dp\" />\r\n\r\n            <TextView\r\n                android:id=\"@+id/tv_Product\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:drawableStart=\"@drawable/ic_product\"\r\n                android:text=\"Thêm sản phẩm.\"\r\n                android:textSize=\"16dp\" />\r\n\r\n\r\n            <TextView\r\n                android:id=\"@+id/tv_Total_Money\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"Tổng tiền: \"\r\n                android:textSize=\"16dp\" />\r\n\r\n            <LinearLayout\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:layout_marginTop=\"5dp\"\r\n                android:orientation=\"horizontal\">\r\n\r\n                <Button\r\n                    android:id=\"@+id/btn_Add_Note_Bill\"\r\n                    android:layout_width=\"wrap_content\"\r\n                    android:layout_height=\"wrap_content\"\r\n                    android:layout_marginRight=\"8dp\"\r\n                    android:layout_weight=\"1\"\r\n                    android:backgroundTint=\"#80cb8a\"\r\n                    android:drawableLeft=\"@drawable/ic_add\"\r\n                    android:text=\"Thêm ghi chú\" />\r\n\r\n                <Button\r\n                    android:id=\"@+id/btn_Check_Out\"\r\n                    android:layout_width=\"wrap_content\"\r\n                    android:layout_height=\"wrap_content\"\r\n                    android:layout_weight=\"1.5\"\r\n                    android:backgroundTint=\"#80cb8a\"\r\n                    android:text=\"Trả phòng\" />\r\n            </LinearLayout>\r\n        </LinearLayout>\r\n\r\n    </androidx.cardview.widget.CardView>\r\n</LinearLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/item_bill.xml b/app/src/main/res/layout/item_bill.xml
+--- a/app/src/main/res/layout/item_bill.xml	(revision 462ef3147c0b40ebb8b94f60be1c9b9d27683c8d)
++++ b/app/src/main/res/layout/item_bill.xml	(date 1669906425252)
+@@ -59,6 +59,12 @@
+                 android:layout_height="wrap_content"
+                 android:text="Ngày đến: "
+                 android:textSize="16dp" />
++            <TextView
++                android:id="@+id/tv_Hour_Check_In"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:text="Giờ đến: "
++                android:textSize="16dp" />
+ 
+             <TextView
+                 android:id="@+id/tv_Date_Check_Out"
+@@ -66,7 +72,12 @@
+                 android:layout_height="wrap_content"
+                 android:text="Ngày đi: "
+                 android:textSize="16dp" />
+-
++            <TextView
++                android:id="@+id/tv_Hour_Check_Out"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:text="Giờ đi: "
++                android:textSize="16dp" />
+             <TextView
+                 android:id="@+id/tv_Product"
+                 android:layout_width="match_parent"
+Index: build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// Top-level build file where you can add configuration options common to all sub-projects/modules.\r\nplugins {\r\n    id 'com.android.application' version '7.2.0' apply false\r\n    id 'com.android.library' version '7.2.0' apply false\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/build.gradle b/build.gradle
+--- a/build.gradle	(revision 462ef3147c0b40ebb8b94f60be1c9b9d27683c8d)
++++ b/build.gradle	(date 1669908968879)
+@@ -1,5 +1,5 @@
+ // Top-level build file where you can add configuration options common to all sub-projects/modules.
+ plugins {
+-    id 'com.android.application' version '7.2.0' apply false
+-    id 'com.android.library' version '7.2.0' apply false
++    id 'com.android.application' version '7.3.1' apply false
++    id 'com.android.library' version '7.3.1' apply false
+ }
+\ No newline at end of file
+Index: app/src/main/java/team1/fpoly/duan_n1_17303/Dao/StaffDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package team1.fpoly.duan_n1_17303.Dao;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.content.ContentValues;\r\nimport android.content.Context;\r\nimport android.database.Cursor;\r\nimport android.database.sqlite.SQLiteDatabase;\r\n\r\nimport java.util.ArrayList;\r\n\r\nimport team1.fpoly.duan_n1_17303.Database.MyDatabase;\r\nimport team1.fpoly.duan_n1_17303.Object.Staff;\r\n\r\npublic class StaffDao {\r\n    SQLiteDatabase db;\r\n\r\n    public StaffDao(Context context){\r\n        MyDatabase myDatabase = new MyDatabase(context);\r\n        db = myDatabase.getWritableDatabase();\r\n    }\r\n\r\n\r\n    @SuppressLint(\"Range\")\r\n    public ArrayList<Staff> getData(String sql, String...selectionArgs){\r\n\r\n        ArrayList<Staff> listStaff = new ArrayList<>();\r\n\r\n        Cursor cursor = db.rawQuery(sql, selectionArgs);\r\n        while (cursor.moveToNext()){\r\n            Staff staff = new Staff();\r\n            staff.setStaffId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(\"STAFF_ID\"))));\r\n            staff.setStaffUsername(cursor.getString(cursor.getColumnIndex(\"STAFF_USERNAME\")));\r\n            staff.setStaffPassword(cursor.getString(cursor.getColumnIndex(\"STAFF_PASSWORD\")));\r\n            staff.setDisplayName(cursor.getString(cursor.getColumnIndex(\"DISPLAY_NAME\")));\r\n            staff.setDayOfBirth(cursor.getString(cursor.getColumnIndex(\"DATE_OF_BIRTH\")));\r\n            staff.setSex(cursor.getString(cursor.getColumnIndex(\"SEX\")));\r\n            staff.setPhone(cursor.getString(cursor.getColumnIndex(\"PHONE\")));\r\n            listStaff.add(staff);\r\n        }\r\n        return listStaff;\r\n    }\r\n    //Hiện thị dữ liệu\r\n    @SuppressLint(\"Range\")\r\n    public ArrayList<Staff> getDataStaff(){\r\n        String sql = \"SELECT * FROM STAFF\";\r\n\r\n        return getData(sql);\r\n    }\r\n\r\n    //Lấy id Staff\r\n    public Staff getIdStaff(String id){\r\n        String sql = \"SELECT * FROM STAFF WHERE STAFF_USERNAME=?\";\r\n        ArrayList<Staff> listStaff = getData(sql, id);\r\n        return listStaff.get(0);\r\n    }\r\n\r\n    //Thêm dữ liệu\r\n    public long insertStaff(Staff staff){\r\n        ContentValues values = new ContentValues();\r\n        values.put(\"STAFF_USERNAME\", staff.getStaffUsername());\r\n        values.put(\"STAFF_PASSWORD\", staff.getStaffPassword());\r\n        values.put(\"DISPLAY_NAME\", staff.getDisplayName());\r\n        values.put(\"DATE_OF_BIRTH\", staff.getDayOfBirth());\r\n        values.put(\"SEX\", staff.getSex());\r\n        values.put(\"PHONE\", staff.getPhone());\r\n\r\n        long res = db.insert(\"STAFF\", null, values);\r\n        return res;\r\n    }\r\n\r\n    //Cập nhật dữ liệu\r\n    public int updateStaff(Staff staff){\r\n        ContentValues values = new ContentValues();\r\n\r\n        values.put(\"STAFF_USERNAME\", staff.getStaffUsername());\r\n        values.put(\"STAFF_PASSWORD\", staff.getStaffPassword());\r\n        values.put(\"DISPLAY_NAME\", staff.getDisplayName());\r\n        values.put(\"DATE_OF_BIRTH\", staff.getDayOfBirth());\r\n        values.put(\"SEX\", staff.getSex());\r\n        values.put(\"PHONE\", staff.getPhone());\r\n\r\n        int res = db.update(\"STAFF\", values, \"STAFF_ID=?\",new String[]{String.valueOf(staff.getStaffId())});\r\n        return res;\r\n    }\r\n\r\n    //Xóa dữ liệu\r\n    public int deleteStaff(String id){\r\n        int res = db.delete(\"STAFF\", \"STAFF_ID=?\",new String[]{id});\r\n        return res;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/StaffDao.java b/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/StaffDao.java
+--- a/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/StaffDao.java	(revision 462ef3147c0b40ebb8b94f60be1c9b9d27683c8d)
++++ b/app/src/main/java/team1/fpoly/duan_n1_17303/Dao/StaffDao.java	(date 1669907668893)
+@@ -22,9 +22,7 @@
+ 
+     @SuppressLint("Range")
+     public ArrayList<Staff> getData(String sql, String...selectionArgs){
+-
+         ArrayList<Staff> listStaff = new ArrayList<>();
+-
+         Cursor cursor = db.rawQuery(sql, selectionArgs);
+         while (cursor.moveToNext()){
+             Staff staff = new Staff();

@@ -1,0 +1,9 @@
+"Tên đề tài: Ứng dụng quản lý thuê phòng khách sạn
+- Dùng cho nhân viên đứng quầy lễ tân và Quản lý
++ Quản lý DS thông tin phòng (tên, vị trí, số giường, giá thuê ngày, giá thuê giờ, ghi chú) 
++ Quản lý DS khách hàng 
++ Quản lý sản phẩm (đồ dùng trong phòng....)
++ Quản lý tài khoản 
++ Quản lý hóa đơn thuê phòng (id kh, id phòng, ngày bắt đầu, ngày kết thúc, giờ bắt đầu, giờ kết thúc, ngày trả, giờ trả phòng, ghi chú ...)
+
+Tìm phòng còn trống: nhập vào khoảng ngày muốn thuê ==> tìm trong bảng hóa đơn ở khoảng ngày đó (lấy ra ds các hóa đơn) ==> đối chiếu với ds phòng, nếu phòng nào không xuất hiện trong ds hóa đơn thì đó là phòng trống trong khoảng thời gian cần tìm).... nhóm tìm hiểu thêm"..
